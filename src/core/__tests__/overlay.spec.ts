@@ -117,6 +117,45 @@ describe('Overlay controller', () => {
     controller.stop()
   })
 
+  it('clamps tooltip position within viewport', () => {
+    Object.defineProperty(window, 'innerWidth', { value: 120, configurable: true })
+    Object.defineProperty(window, 'innerHeight', { value: 80, configurable: true })
+    const target = document.createElement('div')
+    target.className = 'target'
+    target.getBoundingClientRect = () =>
+      ({
+        top: 2,
+        left: 110,
+        width: 50,
+        height: 20,
+        bottom: 22
+      }) as DOMRect
+    document.body.appendChild(target)
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'TooltipComponent',
+        __file: '/abs/path/src/components/Tooltip.vue'
+      }
+    }
+    Object.defineProperty(document, 'elementFromPoint', {
+      value: vi.fn(() => target),
+      configurable: true
+    })
+
+    const controller = createOverlayController(window)
+    controller.start()
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 1, clientY: 2 }))
+
+    const tooltip = document.querySelector(
+      '[data-vue-grab-tooltip="true"]'
+    ) as HTMLDivElement
+    const left = Number.parseFloat(tooltip.style.left)
+    const top = Number.parseFloat(tooltip.style.top)
+    expect(left).toBeGreaterThanOrEqual(0)
+    expect(top).toBeGreaterThanOrEqual(0)
+    controller.stop()
+  })
+
   it('copies metadata on click', async () => {
     const target = document.createElement('div')
     target.className = 'target'

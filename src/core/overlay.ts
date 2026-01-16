@@ -62,19 +62,31 @@ function createTooltipElement(targetWindow: Window) {
   return el;
 }
 
-function updateTooltipPosition(tooltip: HTMLDivElement, rect: DOMRect) {
+function updateTooltipPosition(
+  tooltip: HTMLDivElement,
+  rect: DOMRect,
+  targetWindow: Window
+) {
   const offset = 6;
   const top = rect.top - 24 - offset;
   const nextTop = top >= 0 ? top : rect.bottom + offset;
-  tooltip.style.left = `${Math.max(0, rect.left)}px`;
-  tooltip.style.top = `${Math.max(0, nextTop)}px`;
+  const maxLeft = targetWindow.innerWidth - tooltip.offsetWidth - offset;
+  const maxTop = targetWindow.innerHeight - tooltip.offsetHeight - offset;
+  const left = Math.max(0, Math.min(rect.left, maxLeft));
+  const finalTop = Math.max(0, Math.min(nextTop, maxTop));
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${finalTop}px`;
 }
 
 function formatLocation(metadata: ReturnType<typeof extractMetadata>) {
   if (!metadata?.file) return '';
-  const file = metadata.file.includes('/src/')
-    ? metadata.file.split('/src/')[1]
-    : metadata.file;
+  const file = (() => {
+    if (metadata.file.includes('/src/')) return metadata.file.split('/src/')[1];
+    if (metadata.file.startsWith('/')) {
+      return metadata.file.split('/').slice(-2).join('/');
+    }
+    return metadata.file;
+  })();
   const line = metadata.line;
   const column = metadata.column;
   if (typeof line === 'number' && typeof column === 'number') {
@@ -230,7 +242,7 @@ export function createOverlayController(
     const label = formatLocation(metadata);
     if (label) {
       activeTooltip.textContent = label;
-      updateTooltipPosition(activeTooltip, rect);
+      updateTooltipPosition(activeTooltip, rect, targetWindow);
       activeTooltip.style.opacity = '1';
     } else {
       activeTooltip.style.opacity = '0';
