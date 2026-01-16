@@ -84,16 +84,16 @@ To test in a real app, link this package into a separate Vue/Nuxt project:
 pnpm link --global
 
 # In your app repo
-pnpm link --global vue-grab
+pnpm link --global @akccakcctw/vue-grab
 ```
 
-Note: `pnpm link --global vue-grab` does not update your app's `package.json` by default.
+Note: `pnpm link --global @akccakcctw/vue-grab` does not update your app's `package.json` by default.
 If you want it recorded in dependencies, use one of the following in your app repo:
 
 ```bash
-pnpm add -D link:vue-grab
+pnpm add -D link:/absolute/path/to/vue-grab
 # or
-pnpm add -D link:/Users/rex.tsou/vbox/vue-grab
+pnpm add -D link:../vue-grab
 ```
 
 Then run your app and verify `window.__VUE_GRAB__` in the browser console.
@@ -113,4 +113,3 @@ Manual verification checklist:
 ## Acknowledgment
 
 Special thanks to [react-grab](https://www.react-grab.com/) ([GitHub](https://github.com/aidenybai/react-grab)). This project was inspired by and references the excellent work done by the `react-grab` team. `vue-grab` aims to bring a similar developer experience to the Vue and Nuxt ecosystem.
-
