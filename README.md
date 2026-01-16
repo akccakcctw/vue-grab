@@ -85,3 +85,15 @@ pnpm link --global vue-grab
 ```
 
 Then run your app and verify `window.__VUE_GRAB__` in the browser console.
+
+Cleanup when finished:
+
+```bash
+# In your app repo
+pnpm unlink --global vue-grab
+```
+
+Manual verification checklist:
+- Hover highlights appear when `activate()` is called.
+- Clicking copies metadata (or triggers `onCopy` if configured).
+- `grabFromSelector` returns component info for a known element.
