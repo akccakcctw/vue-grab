@@ -16,6 +16,20 @@ describe('Overlay controller', () => {
     expect(document.querySelector('[data-vue-grab-overlay="true"]')).toBeFalsy()
   })
 
+  it('applies custom overlay styles', () => {
+    const controller = createOverlayController(window, {
+      overlayStyle: {
+        border: '3px solid rgb(0, 0, 0)'
+      }
+    })
+    controller.start()
+    const overlay = document.querySelector(
+      '[data-vue-grab-overlay="true"]'
+    ) as HTMLDivElement
+    expect(overlay.style.border).toBe('3px solid rgb(0, 0, 0)')
+    controller.stop()
+  })
+
   it('updates overlay position on mouse move', () => {
     const target = document.createElement('div')
     target.className = 'target'

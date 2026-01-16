@@ -27,10 +27,20 @@ describe('Vue plugin', () => {
       getComponentDetails: vi.fn()
     })
 
-    const plugin = createVueGrabPlugin({ enabled: true })
+    const plugin = createVueGrabPlugin({
+      enabled: true,
+      overlayStyle: {
+        border: '1px solid red'
+      }
+    })
     plugin.install()
 
     expect(installSpy).toHaveBeenCalledTimes(1)
+    expect(installSpy).toHaveBeenCalledWith(window, {
+      overlayStyle: {
+        border: '1px solid red'
+      }
+    })
   })
 
   it('skips install when disabled', () => {

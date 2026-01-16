@@ -8,7 +8,13 @@ type OverlayController = {
   clear: () => void;
 };
 
-function createOverlayElement(targetWindow: Window) {
+export type OverlayStyle = Record<string, string>;
+
+export type OverlayOptions = {
+  overlayStyle?: OverlayStyle;
+};
+
+function createOverlayElement(targetWindow: Window, options?: OverlayOptions) {
   const el = targetWindow.document.createElement('div');
   el.setAttribute('data-vue-grab-overlay', 'true');
   el.style.position = 'fixed';
@@ -20,6 +26,11 @@ function createOverlayElement(targetWindow: Window) {
   el.style.left = '0';
   el.style.width = '0';
   el.style.height = '0';
+  if (options?.overlayStyle) {
+    for (const [key, value] of Object.entries(options.overlayStyle)) {
+      (el.style as any)[key] = value;
+    }
+  }
   return el;
 }
 
@@ -53,13 +64,16 @@ async function copyToClipboard(targetWindow: Window, text: string) {
   textarea.remove();
 }
 
-export function createOverlayController(targetWindow: Window): OverlayController {
+export function createOverlayController(
+  targetWindow: Window,
+  options?: OverlayOptions
+): OverlayController {
   let overlay: HTMLDivElement | null = null;
   let active = false;
 
   const ensureOverlay = () => {
     if (!overlay) {
-      overlay = createOverlayElement(targetWindow);
+      overlay = createOverlayElement(targetWindow, options);
       targetWindow.document.body.appendChild(overlay);
     }
     return overlay;

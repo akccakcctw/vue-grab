@@ -1,5 +1,6 @@
 import { extractMetadata, identifyComponent } from './identifier';
 import { createOverlayController } from './overlay';
+import type { OverlayOptions } from './overlay';
 
 export interface ComponentInfo {
   name: string;
@@ -11,6 +12,8 @@ export interface ComponentInfo {
   column?: number;
   vnode?: any;
 }
+
+export type VueGrabOptions = OverlayOptions;
 
 export interface VueGrabAPI {
   activate(): void;
@@ -36,9 +39,12 @@ function getComponentInfo(el: HTMLElement | null): ComponentInfo | null {
   };
 }
 
-export function createVueGrabAPI(targetWindow: Window): VueGrabAPI {
+export function createVueGrabAPI(
+  targetWindow: Window,
+  options: VueGrabOptions = {}
+): VueGrabAPI {
   let active = false;
-  const overlay = createOverlayController(targetWindow);
+  const overlay = createOverlayController(targetWindow, options);
 
   return {
     activate() {
@@ -83,11 +89,11 @@ export function createVueGrabAPI(targetWindow: Window): VueGrabAPI {
   };
 }
 
-export function installVueGrab(targetWindow: Window) {
+export function installVueGrab(targetWindow: Window, options: VueGrabOptions = {}) {
   const existing = (targetWindow as any).__VUE_GRAB__ as VueGrabAPI | undefined;
   if (existing) return existing;
 
-  const api = createVueGrabAPI(targetWindow);
+  const api = createVueGrabAPI(targetWindow, options);
   (targetWindow as any).__VUE_GRAB__ = api;
   return api;
 }

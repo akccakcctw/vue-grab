@@ -99,7 +99,11 @@ import VueGrab from 'vue-grab'
 
 const app = createApp(App)
 if (process.env.NODE_ENV === 'development') {
-  app.use(VueGrab)
+  app.use(VueGrab, {
+    overlayStyle: {
+      border: '2px dashed #111'
+    }
+  })
 }
 app.mount('#app')
 ```
@@ -112,7 +116,10 @@ Configuration key: `vueGrab` (example below).
 export default defineNuxtConfig({
   modules: ['vue-grab'],
   vueGrab: {
-    enabled: true
+    enabled: true,
+    overlayStyle: {
+      border: '2px dashed #111'
+    }
   }
 })
 ```

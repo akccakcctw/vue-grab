@@ -58,6 +58,7 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
 
 ## 4. Nuxt Support
 In Nuxt applications, `vue-grab` is automatically injected via a Nuxt Module. The API remains identical.
+Configuration: `vueGrab` accepts `enabled` and optional `overlayStyle` (CSS style map).
 
 ## 5. Development Tips for Agents
 *   **Absolute Paths:** `vue-grab` provides absolute file paths in development mode, allowing you to immediately open the correct file without guessing.

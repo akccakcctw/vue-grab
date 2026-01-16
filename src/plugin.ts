@@ -1,6 +1,7 @@
 import { installVueGrab } from './core/api';
+import type { VueGrabOptions } from './core/api';
 
-export type VueGrabPluginOptions = {
+export type VueGrabPluginOptions = VueGrabOptions & {
   enabled?: boolean;
 };
 
@@ -20,7 +21,9 @@ export function createVueGrabPlugin(options: VueGrabPluginOptions = {}) {
       const enabled =
         typeof options.enabled === 'boolean' ? options.enabled : isDevEnvironment();
       if (enabled && typeof window !== 'undefined') {
-        installVueGrab(window);
+        installVueGrab(window, {
+          overlayStyle: options.overlayStyle
+        });
       }
     }
   };
