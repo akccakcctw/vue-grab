@@ -5,7 +5,7 @@ Developer-only bridge for inspecting Vue/Nuxt component context from the DOM.
 ## Install
 
 ```bash
-pnpm add -D vue-grab
+pnpm add -D @akccakcctw/vue-grab
 ```
 
 ## Vue Usage
