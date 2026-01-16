@@ -1,0 +1,9 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "@akccakcctw/vue-grab",
+      "changelog-path": "CHANGELOG.md"
+    }
+  }
+}
