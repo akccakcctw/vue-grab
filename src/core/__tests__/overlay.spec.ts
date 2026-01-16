@@ -30,6 +30,19 @@ describe('Overlay controller', () => {
     controller.stop()
   })
 
+  it('updates overlay styles at runtime', () => {
+    const controller = createOverlayController(window)
+    controller.start()
+    controller.setStyle({
+      border: '1px dotted rgb(10, 20, 30)'
+    })
+    const overlay = document.querySelector(
+      '[data-vue-grab-overlay="true"]'
+    ) as HTMLDivElement
+    expect(overlay.style.border).toBe('1px dotted rgb(10, 20, 30)')
+    controller.stop()
+  })
+
   it('updates overlay position on mouse move', () => {
     const target = document.createElement('div')
     target.className = 'target'

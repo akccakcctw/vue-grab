@@ -71,6 +71,7 @@ interface VueGrabAPI {
   grabAt(x: number, y: number): ComponentInfo | null;
   grabFromSelector(selector: string): ComponentInfo | null;
   highlight(selector: string): void;
+  setOverlayStyle(style: Record<string, string>): void;
 }
 ```
 

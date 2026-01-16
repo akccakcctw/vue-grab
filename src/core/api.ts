@@ -25,6 +25,7 @@ export interface VueGrabAPI {
   enable(): void;
   disable(): void;
   getComponentDetails(selectorOrElement: string | Element): ComponentInfo | null;
+  setOverlayStyle(style: Record<string, string>): void;
 }
 
 function getComponentInfo(el: HTMLElement | null): ComponentInfo | null {
@@ -85,6 +86,9 @@ export function createVueGrabAPI(
         return getComponentInfo(el);
       }
       return getComponentInfo(selectorOrElement as HTMLElement);
+    },
+    setOverlayStyle(style: Record<string, string>) {
+      overlay.setStyle(style);
     }
   };
 }

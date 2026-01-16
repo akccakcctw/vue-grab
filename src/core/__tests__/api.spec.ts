@@ -118,4 +118,19 @@ describe('VueGrab API', () => {
     expect(infoByEl?.name).toBe('TestComponent')
     wrapper.unmount()
   })
+
+  it('updates overlay style via API', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+    const api = createVueGrabAPI(window)
+    api.setOverlayStyle({
+      border: '4px solid rgb(1, 2, 3)'
+    })
+    api.highlight('.target')
+    const overlay = document.querySelector(
+      '[data-vue-grab-overlay="true"]'
+    ) as HTMLDivElement
+    expect(overlay.style.border).toBe('4px solid rgb(1, 2, 3)')
+  })
 })

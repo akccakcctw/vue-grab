@@ -6,6 +6,7 @@ type OverlayController = {
   isActive: () => boolean;
   highlight: (el: HTMLElement | null) => void;
   clear: () => void;
+  setStyle: (style: OverlayStyle) => void;
 };
 
 export type OverlayStyle = Record<string, string>;
@@ -70,10 +71,13 @@ export function createOverlayController(
 ): OverlayController {
   let overlay: HTMLDivElement | null = null;
   let active = false;
+  let overlayStyle: OverlayStyle = options?.overlayStyle ?? {};
 
   const ensureOverlay = () => {
     if (!overlay) {
-      overlay = createOverlayElement(targetWindow, options);
+      overlay = createOverlayElement(targetWindow, {
+        overlayStyle
+      });
       targetWindow.document.body.appendChild(overlay);
     }
     return overlay;
@@ -132,6 +136,13 @@ export function createOverlayController(
       if (!overlay) return;
       overlay.style.width = '0';
       overlay.style.height = '0';
+    },
+    setStyle(style: OverlayStyle) {
+      overlayStyle = style;
+      if (!overlay) return;
+      for (const [key, value] of Object.entries(style)) {
+        (overlay.style as any)[key] = value;
+      }
     }
   };
 }

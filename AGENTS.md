@@ -22,6 +22,7 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
 | `enable()` | Alias for `activate()`. | N/A | `void` |
 | `disable()` | Alias for `deactivate()`. | N/A | `void` |
 | `getComponentDetails(selectorOrElement)` | Alias for grab via selector or element. | `selectorOrElement: string \| Element` | `ComponentInfo \| null` |
+| `setOverlayStyle(style)` | Update overlay styling at runtime. | `style: Record<string, string>` | `void` |
 
 ### Data Structures
 

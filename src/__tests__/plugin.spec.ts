@@ -24,7 +24,8 @@ describe('Vue plugin', () => {
       highlight: vi.fn(),
       enable: vi.fn(),
       disable: vi.fn(),
-      getComponentDetails: vi.fn()
+      getComponentDetails: vi.fn(),
+      setOverlayStyle: vi.fn()
     })
 
     const plugin = createVueGrabPlugin({
