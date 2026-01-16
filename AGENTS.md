@@ -18,6 +18,7 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
 | `grabFromSelector(selector)` | Get component info from a CSS selector. | `selector: string` | `ComponentInfo \| null` |
 | `activate()` | Enable visual inspection mode (highlights on hover). | N/A | `void` |
 | `deactivate()` | Disable visual inspection mode. | N/A | `void` |
+| `highlight(selector)` | Programmatically highlight an element. | `selector: string` | `void` |
 
 ### Data Structures
 
@@ -28,6 +29,8 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
   "file": "/Users/user/project/src/components/MyButton.vue",
   "props": { "label": "Click Me" },
   "data": { "count": 0 },
+  "line": 12,
+  "column": 8,
   "vnode": { ... } // Internal Vue vnode structure
 }
 ```

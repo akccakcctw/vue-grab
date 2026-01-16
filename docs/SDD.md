@@ -16,6 +16,7 @@ This tool is specifically designed to work with `chrome-devtools-mcp` to facilit
     *   Line/Column numbers (if available)
     *   Current Props
     *   Current Data/State
+    *   VNode (if available)
 *   **Visual Feedback:** Highlight components on hover when "Grab Mode" is active.
 *   **Clipboard Integration:** Copy component details to clipboard on click.
 *   **Framework Support:**
@@ -68,6 +69,7 @@ interface VueGrabAPI {
   // Direct Query (for AI Agents)
   grabAt(x: number, y: number): ComponentInfo | null;
   grabFromSelector(selector: string): ComponentInfo | null;
+  highlight(selector: string): void;
 }
 ```
 
@@ -79,6 +81,9 @@ interface ComponentInfo {
   props: Record<string, any>;
   data: Record<string, any>;
   element: HTMLElement; // Reference to the root DOM element
+  line?: number;
+  column?: number;
+  vnode?: any;
 }
 ```
 
@@ -100,6 +105,16 @@ app.mount('#app')
 
 ### 5.2 Nuxt Module
 A Nuxt module that automatically injects the plugin in development mode.
+Configuration key: `vueGrab` (example below).
+
+```ts
+export default defineNuxtConfig({
+  modules: ['vue-grab'],
+  vueGrab: {
+    enabled: true
+  }
+})
+```
 
 ## 6. Development Plan (TDD)
 
