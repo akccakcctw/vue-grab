@@ -14,6 +14,7 @@ export type OverlayStyle = Record<string, string>;
 export type OverlayOptions = {
   overlayStyle?: OverlayStyle;
   onCopy?: (payload: string) => void;
+  onAfterCopy?: () => void;
   copyOnClick?: boolean;
   rootDir?: string;
 };
@@ -259,11 +260,27 @@ export function createOverlayController(
     const instance = identifyComponent(el);
     const metadata = extractMetadata(instance);
     const payload = serializeMetadata(metadata);
+
+    const activeTooltip = ensureTooltip();
+    const originalText = activeTooltip.textContent;
+    activeTooltip.textContent = 'Copied!';
+    activeTooltip.style.background = '#27ae60';
+
+    const finish = () => {
+      if (options?.onAfterCopy) {
+        options.onAfterCopy();
+      }
+    };
+
     if (options?.onCopy) {
       options.onCopy(payload);
+      setTimeout(finish, 600);
       return;
     }
-    void copyToClipboard(targetWindow, payload);
+
+    void copyToClipboard(targetWindow, payload).then(() => {
+      setTimeout(finish, 600);
+    });
   };
 
   return {

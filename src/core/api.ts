@@ -47,7 +47,12 @@ export function createVueGrabAPI(
   options: VueGrabOptions = {}
 ): VueGrabAPI {
   let active = false;
-  const overlay = createOverlayController(targetWindow, options);
+  const overlay = createOverlayController(targetWindow, {
+    ...options,
+    onAfterCopy: () => {
+      api.deactivate();
+    }
+  });
   const widget = createToggleWidget(targetWindow, {
     onToggle(nextActive) {
       if (nextActive) {
