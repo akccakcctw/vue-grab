@@ -9,8 +9,12 @@ function isDevEnvironment() {
   if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
     return Boolean((import.meta as any).env.DEV);
   }
-  if (typeof process !== 'undefined') {
-    return process.env.NODE_ENV !== 'production';
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.NODE_ENV !== 'production';
+    }
+  } catch {
+    // ignore ReferenceError
   }
   return false;
 }
