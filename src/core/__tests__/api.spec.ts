@@ -29,14 +29,14 @@ describe('VueGrab API', () => {
     overlay?.remove()
     const tooltip = document.querySelector('[data-vue-grab-tooltip="true"]')
     tooltip?.remove()
-    const toggle = document.querySelector('[data-vue-grab-toggle="true"]')
-    toggle?.remove()
+    const toolbar = document.querySelector('[data-vue-grab-toolbar]')
+    toolbar?.remove()
     document.body.innerHTML = ''
   })
 
   it('tracks activation state', () => {
     const api = createVueGrabAPI(window)
-    const toggle = document.querySelector('[data-vue-grab-toggle="true"]')
+    const toggle = document.querySelector('[data-vue-grab-toggle]')
     expect(toggle).toBeTruthy()
     expect(api.isActive).toBe(false)
     api.activate()

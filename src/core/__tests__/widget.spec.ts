@@ -11,19 +11,23 @@ describe('Toggle widget', () => {
     })
     widget.mount()
 
-    const button = document.querySelector(
-      '[data-vue-grab-toggle="true"]'
-    ) as HTMLButtonElement
-    Object.defineProperty(button, 'offsetWidth', { value: 80, configurable: true })
-    Object.defineProperty(button, 'offsetHeight', { value: 30, configurable: true })
+    const container = document.querySelector(
+      '[data-vue-grab-toolbar]'
+    ) as HTMLDivElement
+    expect(container).toBeTruthy()
 
-    button.dispatchEvent(new MouseEvent('mousedown', { clientX: 290, clientY: 190 }))
+    Object.defineProperty(container, 'offsetWidth', { value: 80, configurable: true })
+    Object.defineProperty(container, 'offsetHeight', { value: 30, configurable: true })
+
+    container.dispatchEvent(new MouseEvent('mousedown', { clientX: 290, clientY: 190 }))
     window.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 150 }))
     window.dispatchEvent(new MouseEvent('mouseup'))
 
-    const left = Number.parseFloat(button.style.left)
-    const top = Number.parseFloat(button.style.top)
+    const left = Number.parseFloat(container.style.left)
+    const top = Number.parseFloat(container.style.top)
     expect(left).toBeGreaterThanOrEqual(0)
     expect(top).toBeGreaterThanOrEqual(0)
+    // Should be near the mouse position (offset preserved)
+    // Initial: right 16, bottom 16. but logic sets left/top on drag start.
   })
 })
