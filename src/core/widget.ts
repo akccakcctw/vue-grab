@@ -58,6 +58,7 @@ function createToolbar(targetWindow: Window) {
     gap: '6px',
     overflow: 'hidden',
     maxWidth: '200px',
+    transition: 'max-width 0.2s ease, opacity 0.2s ease'
   });
 
   // Toggle Button
@@ -102,7 +103,7 @@ function createToolbar(targetWindow: Window) {
   inner.appendChild(collapseBtn);
   container.appendChild(inner);
 
-  return { container, toggleBtn, collapseBtn };
+  return { container, toggleBtn, collapseBtn, toggleWrapper };
 }
 
 function setButtonState(toggleBtn: HTMLElement, active: boolean) {
@@ -114,9 +115,23 @@ export function createToggleWidget(
   targetWindow: Window,
   options: ToggleWidgetOptions
 ): ToggleWidgetController {
-  let elements: { container: HTMLDivElement; toggleBtn: HTMLButtonElement; collapseBtn: HTMLButtonElement } | null = null;
+  let elements:
+    | {
+        container: HTMLDivElement;
+        toggleBtn: HTMLButtonElement;
+        collapseBtn: HTMLButtonElement;
+        toggleWrapper: HTMLDivElement;
+      }
+    | null = null;
   let mounted = false;
   let isActive = false;
+  let isCollapsed = false;
+  let lastPosition = {
+    left: '',
+    top: '',
+    right: '',
+    bottom: ''
+  };
   const dragState: DragState = {
     dragging: false,
     offsetX: 0,
@@ -164,11 +179,54 @@ export function createToggleWidget(
     elements.container.style.cursor = 'grab';
   };
 
+  const toggleCollapse = () => {
+    if (!elements) return;
+    const { container, toggleWrapper, collapseBtn } = elements;
+    const svg = collapseBtn.querySelector('svg') as SVGElement | null;
+
+    if (!isCollapsed) {
+      const rect = container.getBoundingClientRect();
+      lastPosition = {
+        left: container.style.left,
+        top: container.style.top,
+        right: container.style.right,
+        bottom: container.style.bottom
+      };
+      const stickLeft = rect.left + rect.width / 2 < targetWindow.innerWidth / 2;
+      container.style.top = `${rect.top}px`;
+      if (stickLeft) {
+        container.style.left = '0px';
+        container.style.right = 'auto';
+      } else {
+        container.style.left = 'auto';
+        container.style.right = '0px';
+      }
+      container.style.bottom = 'auto';
+      container.style.transform = 'scale(0.8)';
+      toggleWrapper.style.maxWidth = '0px';
+      toggleWrapper.style.opacity = '0';
+      toggleWrapper.style.pointerEvents = 'none';
+      if (svg) svg.style.transform = 'rotate(0deg)';
+      isCollapsed = true;
+    } else {
+      container.style.left = lastPosition.left;
+      container.style.top = lastPosition.top;
+      container.style.right = lastPosition.right;
+      container.style.bottom = lastPosition.bottom;
+      container.style.transform = 'scale(1)';
+      toggleWrapper.style.maxWidth = '200px';
+      toggleWrapper.style.opacity = '1';
+      toggleWrapper.style.pointerEvents = 'auto';
+      if (svg) svg.style.transform = 'rotate(180deg)';
+      isCollapsed = false;
+    }
+  };
+
   return {
     mount() {
       if (mounted) return;
       mounted = true;
-      elements = createToolbar(targetWindow) as any;
+      elements = createToolbar(targetWindow);
       if (!elements) return;
 
       setButtonState(elements.toggleBtn, isActive);
@@ -192,7 +250,7 @@ export function createToggleWidget(
         event.preventDefault();
         event.stopPropagation();
         if (dragState.moved) return;
-        // console.log('Collapse clicked');
+        toggleCollapse();
       });
 
       targetWindow.addEventListener('mousemove', onDrag);

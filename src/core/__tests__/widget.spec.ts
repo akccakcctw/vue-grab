@@ -1,7 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import { createToggleWidget } from '../widget'
 
 describe('Toggle widget', () => {
+  afterEach(() => {
+    document.querySelectorAll('[data-vue-grab-toolbar]').forEach((el) => el.remove())
+  })
+
   it('can be dragged within the viewport', () => {
     Object.defineProperty(window, 'innerWidth', { value: 300, configurable: true })
     Object.defineProperty(window, 'innerHeight', { value: 200, configurable: true })
@@ -29,5 +33,25 @@ describe('Toggle widget', () => {
     expect(top).toBeGreaterThanOrEqual(0)
     // Should be near the mouse position (offset preserved)
     // Initial: right 16, bottom 16. but logic sets left/top on drag start.
+  })
+
+  it('collapses and expands the toolbar', () => {
+    const widget = createToggleWidget(window, {
+      onToggle: () => {}
+    })
+    widget.mount()
+
+    const collapse = document.querySelector(
+      '[data-vue-grab-collapse]'
+    ) as HTMLButtonElement
+    const toggleWrapper = document.querySelector(
+      '[data-vue-grab-toggle]'
+    )?.parentElement as HTMLDivElement
+
+    collapse.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(toggleWrapper.style.maxWidth).toBe('0px')
+
+    collapse.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(toggleWrapper.style.maxWidth).toBe('200px')
   })
 })
