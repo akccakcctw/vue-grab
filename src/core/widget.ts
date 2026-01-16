@@ -18,7 +18,6 @@ function createButton(targetWindow: Window) {
   const button = targetWindow.document.createElement('button');
   button.type = 'button';
   button.setAttribute('data-vue-grab-toggle', 'true');
-  button.setAttribute('data-react-grab-toolbar', 'true');
   button.style.position = 'fixed';
   button.style.right = '16px';
   button.style.bottom = '16px';
