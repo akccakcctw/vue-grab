@@ -21,6 +21,7 @@ describe('Vue plugin', () => {
       isActive: false,
       grabAt: vi.fn(),
       grabFromSelector: vi.fn(),
+      grabFromElement: vi.fn(),
       highlight: vi.fn(),
       enable: vi.fn(),
       disable: vi.fn(),

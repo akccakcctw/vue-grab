@@ -70,6 +70,7 @@ interface VueGrabAPI {
   // Direct Query (for AI Agents)
   grabAt(x: number, y: number): ComponentInfo | null;
   grabFromSelector(selector: string): ComponentInfo | null;
+  grabFromElement(element: Element): ComponentInfo | null;
   highlight(selector: string): void;
   setOverlayStyle(style: Record<string, string>): void;
 }

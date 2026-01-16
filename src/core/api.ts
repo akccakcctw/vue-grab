@@ -21,6 +21,7 @@ export interface VueGrabAPI {
   readonly isActive: boolean;
   grabAt(x: number, y: number): ComponentInfo | null;
   grabFromSelector(selector: string): ComponentInfo | null;
+  grabFromElement(element: Element): ComponentInfo | null;
   highlight(selector: string): void;
   enable(): void;
   disable(): void;
@@ -67,6 +68,9 @@ export function createVueGrabAPI(
     grabFromSelector(selector: string) {
       const el = targetWindow.document.querySelector(selector) as HTMLElement | null;
       return getComponentInfo(el);
+    },
+    grabFromElement(element: Element) {
+      return getComponentInfo(element as HTMLElement);
     },
     highlight(selector: string) {
       const el = targetWindow.document.querySelector(selector) as HTMLElement | null;

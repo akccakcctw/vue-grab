@@ -16,6 +16,7 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
 | :--- | :--- | :--- | :--- |
 | `grabAt(x, y)` | Get component info at viewport coordinates. | `x: number, y: number` | `ComponentInfo \| null` |
 | `grabFromSelector(selector)` | Get component info from a CSS selector. | `selector: string` | `ComponentInfo \| null` |
+| `grabFromElement(element)` | Get component info from a DOM element. | `element: Element` | `ComponentInfo \| null` |
 | `activate()` | Enable visual inspection mode (highlights on hover). | N/A | `void` |
 | `deactivate()` | Disable visual inspection mode. | N/A | `void` |
 | `highlight(selector)` | Programmatically highlight an element. | `selector: string` | `void` |

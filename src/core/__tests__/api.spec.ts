@@ -63,6 +63,17 @@ describe('VueGrab API', () => {
     wrapper.unmount()
   })
 
+  it('returns component info from element', () => {
+    const wrapper = mount(TestComponent, {
+      attachTo: document.body
+    })
+    const api = createVueGrabAPI(window)
+    const el = wrapper.find('.target').element
+    const info = api.grabFromElement(el)
+    expect(info?.element).toBe(el)
+    wrapper.unmount()
+  })
+
   it('highlights an element from selector', () => {
     const wrapper = mount(TestComponent, {
       attachTo: document.body
