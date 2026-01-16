@@ -69,6 +69,15 @@ describe('VueGrab API', () => {
     wrapper.unmount()
   })
 
+  it('returns dom info when no vue instance exists', () => {
+    const el = document.createElement('button')
+    el.className = 'plain'
+    document.body.appendChild(el)
+    const api = createVueGrabAPI(window)
+    const info = api.grabFromSelector('.plain')
+    expect(info?.name).toBe('<button>')
+  })
+
   it('returns component info from element', () => {
     const wrapper = mount(TestComponent, {
       attachTo: document.body

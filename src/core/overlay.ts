@@ -82,6 +82,7 @@ function updateTooltipPosition(
 
 function formatLocation(metadata: ReturnType<typeof extractMetadata>, rootDir?: string) {
   if (!metadata?.file) return '';
+  if (metadata.file === 'unknown') return metadata.name || '';
   const file = (() => {
     if (rootDir && metadata.file.startsWith(rootDir)) {
       const relative = metadata.file.slice(rootDir.length).replace(/^\/+/, '');
@@ -241,7 +242,7 @@ export function createOverlayController(
     updateOverlayPosition(activeOverlay, rect);
 
     const instance = identifyComponent(el);
-    const metadata = extractMetadata(instance);
+    const metadata = extractMetadata(instance, el);
     const label = formatLocation(metadata, options?.rootDir);
     if (label) {
       activeTooltip.textContent = label;

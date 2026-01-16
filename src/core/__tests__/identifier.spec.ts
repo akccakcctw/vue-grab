@@ -114,4 +114,13 @@ describe('Component Identifier', () => {
       column: 2
     })
   })
+
+  it('returns dom fallback when no instance is found', () => {
+    const el = document.createElement('button')
+    const metadata = extractMetadata(null, el)
+    expect(metadata).toMatchObject({
+      name: '<button>',
+      file: 'unknown'
+    })
+  })
 })

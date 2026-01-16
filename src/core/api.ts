@@ -33,7 +33,7 @@ export interface VueGrabAPI {
 function getComponentInfo(el: HTMLElement | null): ComponentInfo | null {
   if (!el) return null;
   const instance = identifyComponent(el);
-  const metadata = extractMetadata(instance);
+  const metadata = extractMetadata(instance, el);
   if (!metadata) return null;
 
   return {

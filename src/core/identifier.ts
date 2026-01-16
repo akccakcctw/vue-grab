@@ -15,8 +15,8 @@ export function identifyComponent(el: HTMLElement | null): any {
   return null;
 }
 
-export function extractMetadata(instance: any) {
-  if (!instance) return null;
+export function extractMetadata(instance: any, el?: HTMLElement | null) {
+  if (!instance && !el) return null;
 
   const resolveType = (start: any) => {
     let curr = start;
@@ -31,27 +31,35 @@ export function extractMetadata(instance: any) {
     return { type: start.type || start.$options || start.type?.__vccOpts || {}, instance: start };
   };
 
-  const resolved = resolveType(instance);
+  const resolved = instance ? resolveType(instance) : { type: {}, instance: null };
   const type = resolved.type || {};
-  const props = instance.props || instance.$props || {};
+  const props = instance?.props || instance?.$props || {};
   const data =
-    (instance.data && Object.keys(instance.data).length > 0
+    (instance?.data && Object.keys(instance.data).length > 0
       ? instance.data
-      : instance.setupState) ||
-    instance.$data ||
+      : instance?.setupState) ||
+    instance?.$data ||
     {};
-  const vnode = instance.vnode || instance.$vnode;
+  const vnode = instance?.vnode || instance?.$vnode;
   const loc =
     vnode?.loc?.start ||
     resolved.instance?.vnode?.loc?.start ||
     resolved.instance?.parent?.vnode?.loc?.start;
 
-  const metadata: Record<string, any> = {
-    name: type.name || type.__name || type.__vccOpts?.name || 'AnonymousComponent',
-    file: type.__file || type.__vccOpts?.__file || 'unknown',
-    props,
-    data
-  };
+  const metadata: Record<string, any> = instance
+    ? {
+        name: type.name || type.__name || type.__vccOpts?.name || 'AnonymousComponent',
+        file: type.__file || type.__vccOpts?.__file || 'unknown',
+        props,
+        data
+      }
+    : {
+        name: el?.tagName ? `<${el.tagName.toLowerCase()}>` : 'unknown',
+        file: 'unknown',
+        props: {},
+        data: {},
+        element: el || null
+      };
 
   if (typeof loc?.line === 'number') {
     metadata.line = loc.line;
