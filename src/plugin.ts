@@ -24,7 +24,8 @@ export function createVueGrabPlugin(options: VueGrabPluginOptions = {}) {
         installVueGrab(window, {
           overlayStyle: options.overlayStyle,
           onCopy: options.onCopy,
-          copyOnClick: options.copyOnClick
+          copyOnClick: options.copyOnClick,
+          rootDir: options.rootDir
         });
       }
     }

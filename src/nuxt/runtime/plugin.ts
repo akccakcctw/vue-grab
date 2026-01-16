@@ -7,6 +7,7 @@ export default defineNuxtPlugin(() => {
   if (typeof window === 'undefined') return;
   installVueGrab(window, {
     overlayStyle: config.overlayStyle,
-    copyOnClick: config.copyOnClick
+    copyOnClick: config.copyOnClick,
+    rootDir: config.rootDir
   });
 });

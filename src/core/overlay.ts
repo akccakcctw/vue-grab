@@ -15,6 +15,7 @@ export type OverlayOptions = {
   overlayStyle?: OverlayStyle;
   onCopy?: (payload: string) => void;
   copyOnClick?: boolean;
+  rootDir?: string;
 };
 
 function createOverlayElement(targetWindow: Window, options?: OverlayOptions) {
@@ -78,21 +79,19 @@ function updateTooltipPosition(
   tooltip.style.top = `${finalTop}px`;
 }
 
-function formatLocation(metadata: ReturnType<typeof extractMetadata>) {
+function formatLocation(metadata: ReturnType<typeof extractMetadata>, rootDir?: string) {
   if (!metadata?.file) return '';
   const file = (() => {
-    if (metadata.file.includes('/src/')) return metadata.file.split('/src/')[1];
-    if (metadata.file.startsWith('/')) {
-      return metadata.file.split('/').slice(-2).join('/');
+    if (rootDir && metadata.file.startsWith(rootDir)) {
+      const relative = metadata.file.slice(rootDir.length).replace(/^\/+/, '');
+      return relative || metadata.file;
     }
+    if (metadata.file.includes('/src/')) return metadata.file.split('/src/')[1];
     return metadata.file;
   })();
-  const line = metadata.line;
-  const column = metadata.column;
-  if (typeof line === 'number' && typeof column === 'number') {
-    return `${file}:${line}:${column}`;
-  }
-  return file;
+  const line = typeof metadata.line === 'number' ? metadata.line : 0;
+  const column = typeof metadata.column === 'number' ? metadata.column : 0;
+  return `${file}:${line}:${column}`;
 }
 
 function isVueComponentProxy(value: unknown) {
@@ -239,7 +238,7 @@ export function createOverlayController(
 
     const instance = identifyComponent(el);
     const metadata = extractMetadata(instance);
-    const label = formatLocation(metadata);
+    const label = formatLocation(metadata, options?.rootDir);
     if (label) {
       activeTooltip.textContent = label;
       updateTooltipPosition(activeTooltip, rect, targetWindow);

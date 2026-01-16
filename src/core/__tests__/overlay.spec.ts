@@ -117,6 +117,50 @@ describe('Overlay controller', () => {
     controller.stop()
   })
 
+  it('uses rootDir for relative paths', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    target.getBoundingClientRect = () =>
+      ({
+        top: 10,
+        left: 20,
+        width: 100,
+        height: 50,
+        bottom: 60
+      }) as DOMRect
+    document.body.appendChild(target)
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'TooltipComponent',
+        __file: '/root/app/components/Tooltip.vue'
+      },
+      vnode: {
+        loc: {
+          start: {
+            line: 9,
+            column: 4
+          }
+        }
+      }
+    }
+    Object.defineProperty(document, 'elementFromPoint', {
+      value: vi.fn(() => target),
+      configurable: true
+    })
+
+    const controller = createOverlayController(window, {
+      rootDir: '/root/app'
+    })
+    controller.start()
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 1, clientY: 2 }))
+
+    const tooltip = document.querySelector(
+      '[data-vue-grab-tooltip="true"]'
+    ) as HTMLDivElement
+    expect(tooltip.textContent).toBe('components/Tooltip.vue:9:4')
+    controller.stop()
+  })
+
   it('clamps tooltip position within viewport', () => {
     Object.defineProperty(window, 'innerWidth', { value: 120, configurable: true })
     Object.defineProperty(window, 'innerHeight', { value: 80, configurable: true })
