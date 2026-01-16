@@ -58,6 +58,8 @@ When active, `window.__VUE_GRAB__` exposes:
 - `setOverlayStyle(style)`
 - Aliases: `enable()` / `disable()` / `getComponentDetails(selectorOrElement)`
 
+A floating toggle button is injected in dev to switch grab mode on/off.
+
 ## MCP Example
 
 ```js

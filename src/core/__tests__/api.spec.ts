@@ -27,11 +27,15 @@ describe('VueGrab API', () => {
     delete (window as any).__VUE_GRAB__
     const overlay = document.querySelector('[data-vue-grab-overlay="true"]')
     overlay?.remove()
+    const toggle = document.querySelector('[data-vue-grab-toggle="true"]')
+    toggle?.remove()
     document.body.innerHTML = ''
   })
 
   it('tracks activation state', () => {
     const api = createVueGrabAPI(window)
+    const toggle = document.querySelector('[data-vue-grab-toggle="true"]')
+    expect(toggle).toBeTruthy()
     expect(api.isActive).toBe(false)
     api.activate()
     expect(api.isActive).toBe(true)

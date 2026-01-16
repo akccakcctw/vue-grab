@@ -18,6 +18,7 @@ This tool is specifically designed to work with `chrome-devtools-mcp` to facilit
     *   Current Data/State
     *   VNode (if available)
 *   **Visual Feedback:** Highlight components on hover when "Grab Mode" is active.
+*   **Toggle Widget:** Provide a floating UI to toggle Grab Mode in the browser.
 *   **Clipboard Integration:** Copy component details to clipboard on click.
 *   **Framework Support:**
     *   Vue 3 (Composition & Options API)

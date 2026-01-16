@@ -71,3 +71,4 @@ Note: `onCopy` is only supported when using the Vue plugin directly.
 *   **Anonymous Components:** If a component doesn't have a name, `vue-grab` defaults to `AnonymousComponent`. Try to look at the `file` property to identify it.
 *   **Package Manager:** Use `pnpm` instead of `npm` for all package scripts and installs.
 *   **Types:** `VueGrabOptions`, `OverlayOptions`, and `OverlayStyle` are exported from the package.
+*   **UI:** A floating toggle button is injected in dev to enable/disable grab mode.

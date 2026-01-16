@@ -101,6 +101,12 @@ describe('Overlay controller', () => {
 
     const onCopy = vi.fn()
     const controller = createOverlayController(window, { onCopy })
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'TestComponent',
+        __file: '/abs/path/to/TestComponent.vue'
+      }
+    }
     controller.start()
     target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
@@ -126,6 +132,30 @@ describe('Overlay controller', () => {
     target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
     expect(writeText).not.toHaveBeenCalled()
+    controller.stop()
+  })
+
+  it('avoids circular metadata errors on copy', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    const instance: any = {
+      type: {
+        name: 'CycleComponent',
+        __file: '/abs/path/to/CycleComponent.vue'
+      },
+      vnode: {}
+    }
+    instance.vnode.component = instance
+    ;(target as any).__vueParentComponent = instance
+
+    const onCopy = vi.fn()
+    const controller = createOverlayController(window, { onCopy })
+    controller.start()
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    expect(onCopy).toHaveBeenCalledTimes(1)
     controller.stop()
   })
 })

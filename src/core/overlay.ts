@@ -44,8 +44,27 @@ function updateOverlayPosition(overlay: HTMLDivElement, rect: DOMRect) {
   overlay.style.height = `${rect.height}px`;
 }
 
+function safeStringify(value: unknown) {
+  const seen = new WeakSet();
+  return JSON.stringify(
+    value ?? {},
+    (_key, val) => {
+      if (typeof val === 'function') {
+        const name = val.name ? ` ${val.name}` : '';
+        return `[Function${name}]`;
+      }
+      if (typeof val === 'object' && val !== null) {
+        if (seen.has(val)) return '[Circular]';
+        seen.add(val);
+      }
+      return val;
+    },
+    2
+  );
+}
+
 function serializeMetadata(metadata: ReturnType<typeof extractMetadata>) {
-  return JSON.stringify(metadata ?? {}, null, 2);
+  return safeStringify(metadata);
 }
 
 async function copyToClipboard(targetWindow: Window, text: string) {

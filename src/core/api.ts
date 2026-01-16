@@ -1,6 +1,7 @@
 import { extractMetadata, identifyComponent } from './identifier';
 import { createOverlayController } from './overlay';
 import type { OverlayOptions } from './overlay';
+import { createToggleWidget } from './widget';
 
 export interface ComponentInfo {
   name: string;
@@ -47,15 +48,26 @@ export function createVueGrabAPI(
 ): VueGrabAPI {
   let active = false;
   const overlay = createOverlayController(targetWindow, options);
+  const widget = createToggleWidget(targetWindow, {
+    onToggle(nextActive) {
+      if (nextActive) {
+        api.activate();
+      } else {
+        api.deactivate();
+      }
+    }
+  });
 
-  return {
+  const api: VueGrabAPI = {
     activate() {
       active = true;
       overlay.start();
+      widget.setActive(true);
     },
     deactivate() {
       active = false;
       overlay.stop();
+      widget.setActive(false);
     },
     get isActive() {
       return active;
@@ -95,6 +107,11 @@ export function createVueGrabAPI(
       overlay.setStyle(style);
     }
   };
+
+  widget.mount();
+  widget.setActive(active);
+
+  return api;
 }
 
 export function installVueGrab(targetWindow: Window, options: VueGrabOptions = {}) {
