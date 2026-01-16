@@ -1,4 +1,5 @@
 import { extractMetadata, identifyComponent } from './identifier';
+import { createOverlayController } from './overlay';
 
 export interface ComponentInfo {
   name: string;
@@ -30,13 +31,16 @@ function getComponentInfo(el: HTMLElement | null): ComponentInfo | null {
 
 export function createVueGrabAPI(targetWindow: Window): VueGrabAPI {
   let active = false;
+  const overlay = createOverlayController(targetWindow);
 
   return {
     activate() {
       active = true;
+      overlay.start();
     },
     deactivate() {
       active = false;
+      overlay.stop();
     },
     get isActive() {
       return active;
