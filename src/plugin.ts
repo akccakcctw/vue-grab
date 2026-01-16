@@ -9,12 +9,20 @@ function isDevEnvironment() {
   if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
     return Boolean((import.meta as any).env.DEV);
   }
+  
   try {
-    if (typeof process !== 'undefined' && process.env) {
-      return process.env.NODE_ENV !== 'production';
+    const globalScope = 
+      typeof globalThis !== 'undefined' ? globalThis : 
+      typeof window !== 'undefined' ? window : 
+      typeof self !== 'undefined' ? self : 
+      typeof global !== 'undefined' ? global : {};
+
+    const proc = (globalScope as any).process;
+    if (proc && proc.env) {
+      return proc.env.NODE_ENV !== 'production';
     }
   } catch {
-    // ignore ReferenceError
+    // ignore
   }
   return false;
 }
