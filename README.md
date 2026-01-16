@@ -109,3 +109,8 @@ Manual verification checklist:
 - Hover highlights appear when `activate()` is called.
 - Clicking copies metadata (or triggers `onCopy` if configured).
 - `grabFromSelector` returns component info for a known element.
+
+## Acknowledgment
+
+Special thanks to [react-grab](https://www.react-grab.com/) ([GitHub](https://github.com/aidenybai/react-grab)). This project was inspired by and references the excellent work done by the `react-grab` team. `vue-grab` aims to bring a similar developer experience to the Vue and Nuxt ecosystem.
+
