@@ -28,12 +28,14 @@ describe('Vue plugin', () => {
       getComponentDetails: vi.fn(),
       setOverlayStyle: vi.fn()
     })
+    const onCopy = vi.fn()
 
     const plugin = createVueGrabPlugin({
       enabled: true,
       overlayStyle: {
         border: '1px solid red'
-      }
+      },
+      onCopy
     })
     plugin.install()
 
@@ -41,7 +43,8 @@ describe('Vue plugin', () => {
     expect(installSpy).toHaveBeenCalledWith(window, {
       overlayStyle: {
         border: '1px solid red'
-      }
+      },
+      onCopy
     })
   })
 

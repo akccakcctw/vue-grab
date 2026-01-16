@@ -18,9 +18,11 @@ export default defineNuxtModule<VueGrabNuxtModuleOptions>({
     if (!nuxt.options.dev) return;
 
     const publicConfig = (nuxt.options.runtimeConfig.public ||= {});
+    const { enabled, overlayStyle } = options;
     publicConfig.vueGrab = {
       ...(publicConfig.vueGrab as Record<string, any> | undefined),
-      ...options
+      enabled,
+      overlayStyle
     };
 
     const resolver = createResolver(import.meta.url);

@@ -20,6 +20,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(VueGrab, {
     overlayStyle: {
       border: '2px dashed #111'
+    },
+    onCopy(payload) {
+      console.log('vue-grab payload', payload)
     }
   })
 }

@@ -93,4 +93,18 @@ describe('Overlay controller', () => {
     expect(payload).toContain('{')
     controller.stop()
   })
+
+  it('uses onCopy handler when provided', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    const onCopy = vi.fn()
+    const controller = createOverlayController(window, { onCopy })
+    controller.start()
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    expect(onCopy).toHaveBeenCalledTimes(1)
+    controller.stop()
+  })
 })

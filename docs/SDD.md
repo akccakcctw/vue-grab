@@ -74,6 +74,10 @@ interface VueGrabAPI {
   highlight(selector: string): void;
   setOverlayStyle(style: Record<string, string>): void;
 }
+
+Overlay options:
+- `overlayStyle`: override overlay CSS styles.
+- `onCopy`: optional callback invoked instead of clipboard copy (Vue plugin only).
 ```
 
 ### 4.2 Component Info Structure

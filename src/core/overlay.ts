@@ -13,6 +13,7 @@ export type OverlayStyle = Record<string, string>;
 
 export type OverlayOptions = {
   overlayStyle?: OverlayStyle;
+  onCopy?: (payload: string) => void;
 };
 
 function createOverlayElement(targetWindow: Window, options?: OverlayOptions) {
@@ -101,7 +102,12 @@ export function createOverlayController(
     const el = event.target as HTMLElement | null;
     const instance = identifyComponent(el);
     const metadata = extractMetadata(instance);
-    void copyToClipboard(targetWindow, serializeMetadata(metadata));
+    const payload = serializeMetadata(metadata);
+    if (options?.onCopy) {
+      options.onCopy(payload);
+      return;
+    }
+    void copyToClipboard(targetWindow, payload);
   };
 
   return {
