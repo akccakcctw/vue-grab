@@ -64,3 +64,24 @@ When active, `window.__VUE_GRAB__` exposes:
 const info = window.__VUE_GRAB__.grabFromSelector('.my-button');
 console.log(JSON.stringify(info));
 ```
+
+## Development
+
+For maintainers of this package (local dev + manual testing):
+
+```bash
+pnpm install
+pnpm test
+```
+
+To test in a real app, link this package into a separate Vue/Nuxt project:
+
+```bash
+# In this repo
+pnpm link --global
+
+# In your app repo
+pnpm link --global vue-grab
+```
+
+Then run your app and verify `window.__VUE_GRAB__` in the browser console.
