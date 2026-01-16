@@ -272,13 +272,13 @@ export function createOverlayController(
       active = true;
       ensureOverlay();
       targetWindow.document.addEventListener('mousemove', handleMove);
-      targetWindow.document.addEventListener('click', handleClick);
+      targetWindow.document.addEventListener('click', handleClick, true);
     },
     stop() {
       if (!active) return;
       active = false;
       targetWindow.document.removeEventListener('mousemove', handleMove);
-      targetWindow.document.removeEventListener('click', handleClick);
+      targetWindow.document.removeEventListener('click', handleClick, true);
       overlay?.remove();
       overlay = null;
       tooltip?.remove();

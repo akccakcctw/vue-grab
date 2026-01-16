@@ -405,4 +405,27 @@ describe('Overlay controller', () => {
     expect(payload).toContain('"props"')
     controller.stop()
   })
+
+  it('suppresses original click event on captured click', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    const originalClickHandler = vi.fn()
+    target.addEventListener('click', originalClickHandler)
+
+    const controller = createOverlayController(window)
+    controller.start()
+    
+    // Simulate a click. Since we use capture, the controller should handle it first 
+    // and stop propagation, so target shouldn't receive it.
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+
+    expect(originalClickHandler).not.toHaveBeenCalled()
+    
+    controller.stop()
+    // Verify normal behavior resumes
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    expect(originalClickHandler).toHaveBeenCalledTimes(1)
+  })
 })
