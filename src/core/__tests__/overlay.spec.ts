@@ -5,6 +5,8 @@ describe('Overlay controller', () => {
   afterEach(() => {
     const overlay = document.querySelector('[data-vue-grab-overlay="true"]')
     overlay?.remove()
+    const tooltip = document.querySelector('[data-vue-grab-tooltip="true"]')
+    tooltip?.remove()
     document.body.innerHTML = ''
   })
 
@@ -70,6 +72,48 @@ describe('Overlay controller', () => {
     expect(overlay.style.left).toBe('20px')
     expect(overlay.style.width).toBe('100px')
     expect(overlay.style.height).toBe('50px')
+    controller.stop()
+  })
+
+  it('shows file location tooltip on hover', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    target.getBoundingClientRect = () =>
+      ({
+        top: 10,
+        left: 20,
+        width: 100,
+        height: 50,
+        bottom: 60
+      }) as DOMRect
+    document.body.appendChild(target)
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'TooltipComponent',
+        __file: '/abs/path/src/components/Tooltip.vue'
+      },
+      vnode: {
+        loc: {
+          start: {
+            line: 51,
+            column: 3
+          }
+        }
+      }
+    }
+    Object.defineProperty(document, 'elementFromPoint', {
+      value: vi.fn(() => target),
+      configurable: true
+    })
+
+    const controller = createOverlayController(window)
+    controller.start()
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 1, clientY: 2 }))
+
+    const tooltip = document.querySelector(
+      '[data-vue-grab-tooltip="true"]'
+    ) as HTMLDivElement
+    expect(tooltip.textContent).toBe('components/Tooltip.vue:51:3')
     controller.stop()
   })
 

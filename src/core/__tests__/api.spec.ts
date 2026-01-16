@@ -27,6 +27,8 @@ describe('VueGrab API', () => {
     delete (window as any).__VUE_GRAB__
     const overlay = document.querySelector('[data-vue-grab-overlay="true"]')
     overlay?.remove()
+    const tooltip = document.querySelector('[data-vue-grab-tooltip="true"]')
+    tooltip?.remove()
     const toggle = document.querySelector('[data-vue-grab-toggle="true"]')
     toggle?.remove()
     document.body.innerHTML = ''

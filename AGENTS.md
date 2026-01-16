@@ -72,3 +72,4 @@ Note: `onCopy` is only supported when using the Vue plugin directly.
 *   **Package Manager:** Use `pnpm` instead of `npm` for all package scripts and installs.
 *   **Types:** `VueGrabOptions`, `OverlayOptions`, and `OverlayStyle` are exported from the package.
 *   **UI:** A floating toggle button is injected in dev to enable/disable grab mode.
+*   **Hover:** Tooltip shows `file:line:column` when available.

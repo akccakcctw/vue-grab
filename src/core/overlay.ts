@@ -44,6 +44,45 @@ function updateOverlayPosition(overlay: HTMLDivElement, rect: DOMRect) {
   overlay.style.height = `${rect.height}px`;
 }
 
+function createTooltipElement(targetWindow: Window) {
+  const el = targetWindow.document.createElement('div');
+  el.setAttribute('data-vue-grab-tooltip', 'true');
+  el.style.position = 'fixed';
+  el.style.pointerEvents = 'none';
+  el.style.zIndex = '2147483647';
+  el.style.padding = '4px 8px';
+  el.style.borderRadius = '6px';
+  el.style.background = '#111';
+  el.style.color = '#fff';
+  el.style.fontSize = '11px';
+  el.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+  el.style.whiteSpace = 'nowrap';
+  el.style.opacity = '0';
+  el.style.transition = 'opacity 0.12s ease';
+  return el;
+}
+
+function updateTooltipPosition(tooltip: HTMLDivElement, rect: DOMRect) {
+  const offset = 6;
+  const top = rect.top - 24 - offset;
+  const nextTop = top >= 0 ? top : rect.bottom + offset;
+  tooltip.style.left = `${Math.max(0, rect.left)}px`;
+  tooltip.style.top = `${Math.max(0, nextTop)}px`;
+}
+
+function formatLocation(metadata: ReturnType<typeof extractMetadata>) {
+  if (!metadata?.file) return '';
+  const file = metadata.file.includes('/src/')
+    ? metadata.file.split('/src/')[1]
+    : metadata.file;
+  const line = metadata.line;
+  const column = metadata.column;
+  if (typeof line === 'number' && typeof column === 'number') {
+    return `${file}:${line}:${column}`;
+  }
+  return file;
+}
+
 function isVueComponentProxy(value: unknown) {
   if (!value || typeof value !== 'object') return false;
   return (
@@ -149,6 +188,7 @@ export function createOverlayController(
   options?: OverlayOptions
 ): OverlayController {
   let overlay: HTMLDivElement | null = null;
+  let tooltip: HTMLDivElement | null = null;
   let active = false;
   let overlayStyle: OverlayStyle = options?.overlayStyle ?? {};
 
@@ -162,18 +202,39 @@ export function createOverlayController(
     return overlay;
   };
 
+  const ensureTooltip = () => {
+    if (!tooltip) {
+      tooltip = createTooltipElement(targetWindow);
+      targetWindow.document.body.appendChild(tooltip);
+    }
+    return tooltip;
+  };
+
   const handleMove = (event: MouseEvent) => {
     const activeOverlay = ensureOverlay();
+    const activeTooltip = ensureTooltip();
     const el = targetWindow.document.elementFromPoint(event.clientX, event.clientY) as
       | HTMLElement
       | null;
     if (!el) {
       activeOverlay.style.width = '0';
       activeOverlay.style.height = '0';
+      activeTooltip.style.opacity = '0';
       return;
     }
     const rect = el.getBoundingClientRect();
     updateOverlayPosition(activeOverlay, rect);
+
+    const instance = identifyComponent(el);
+    const metadata = extractMetadata(instance);
+    const label = formatLocation(metadata);
+    if (label) {
+      activeTooltip.textContent = label;
+      updateTooltipPosition(activeTooltip, rect);
+      activeTooltip.style.opacity = '1';
+    } else {
+      activeTooltip.style.opacity = '0';
+    }
   };
 
   const handleClick = (event: MouseEvent) => {
@@ -206,6 +267,8 @@ export function createOverlayController(
       targetWindow.document.removeEventListener('click', handleClick);
       overlay?.remove();
       overlay = null;
+      tooltip?.remove();
+      tooltip = null;
     },
     isActive() {
       return active;
