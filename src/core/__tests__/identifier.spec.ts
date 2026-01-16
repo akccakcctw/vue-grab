@@ -80,4 +80,38 @@ describe('Component Identifier', () => {
       vnode: instance.vnode
     })
   })
+
+  it('falls back to parent metadata when file is missing', () => {
+    const parent = {
+      type: {
+        name: 'ParentComponent',
+        __file: '/abs/path/to/ParentComponent.vue',
+        __line: 5,
+        __column: 2
+      },
+      vnode: {
+        loc: {
+          start: {
+            line: 5,
+            column: 2
+          }
+        }
+      }
+    }
+    const child = {
+      type: {
+        name: 'ChildComponent'
+      },
+      parent
+    }
+
+    const metadata = extractMetadata(child)
+
+    expect(metadata).toMatchObject({
+      name: 'ParentComponent',
+      file: '/abs/path/to/ParentComponent.vue',
+      line: 5,
+      column: 2
+    })
+  })
 })
