@@ -16,7 +16,8 @@ import VueGrab from 'vue-grab'
 
 const app = createApp(App)
 
-if (process.env.NODE_ENV === 'development') {
+// Use import.meta.env.DEV for Vite, or process.env.NODE_ENV === 'development' for Webpack
+if (import.meta.env.DEV) {
   app.use(VueGrab, {
     overlayStyle: {
       border: '2px dashed #111'
