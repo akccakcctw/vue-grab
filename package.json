@@ -8,7 +8,9 @@
     ".": "./src/index.ts",
     "./module": "./src/nuxt/module.ts"
   },
-  "nuxt": "src/nuxt/module.ts",
+  "nuxt": {
+    "module": "./src/nuxt/module.ts"
+  },
   "scripts": {
     "test": "vitest run"
   },
