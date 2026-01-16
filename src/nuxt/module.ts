@@ -34,6 +34,9 @@ export default defineNuxtModule<VueGrabNuxtModuleOptions>({
     }
 
     const resolver = createResolver(import.meta.url);
-    addPlugin(resolver.resolve('./runtime/plugin'));
+    addPlugin({
+      src: resolver.resolve('./runtime/plugin'),
+      mode: 'client'
+    });
   }
 });
