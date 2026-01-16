@@ -159,4 +159,20 @@ describe('VueGrab API', () => {
     ) as HTMLDivElement
     expect(overlay.style.border).toBe('4px solid rgb(1, 2, 3)')
   })
+
+  it('supports dom file resolver', () => {
+    const el = document.createElement('div')
+    el.className = 'plain'
+    document.body.appendChild(el)
+    const api = createVueGrabAPI(window)
+    api.setDomFileResolver(() => ({
+      file: '/root/app/components/Plain.vue',
+      line: 2,
+      column: 5
+    }))
+    const info = api.grabFromSelector('.plain')
+    expect(info?.file).toBe('/root/app/components/Plain.vue')
+    expect(info?.line).toBe(2)
+    expect(info?.column).toBe(5)
+  })
 })

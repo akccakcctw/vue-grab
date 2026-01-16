@@ -7,6 +7,7 @@ type OverlayController = {
   highlight: (el: HTMLElement | null) => void;
   clear: () => void;
   setStyle: (style: OverlayStyle) => void;
+  setDomFileResolver: (resolver: OverlayOptions['domFileResolver']) => void;
 };
 
 export type OverlayStyle = Record<string, string>;
@@ -17,6 +18,11 @@ export type OverlayOptions = {
   onAfterCopy?: () => void;
   copyOnClick?: boolean;
   rootDir?: string;
+  domFileResolver?: (el: HTMLElement) => {
+    file?: string;
+    line?: number;
+    column?: number;
+  } | null;
 };
 
 function createOverlayElement(targetWindow: Window, options?: OverlayOptions) {
@@ -207,6 +213,7 @@ export function createOverlayController(
   let tooltip: HTMLDivElement | null = null;
   let active = false;
   let overlayStyle: OverlayStyle = options?.overlayStyle ?? {};
+  let domFileResolver = options?.domFileResolver ?? null;
 
   const ensureOverlay = () => {
     if (!overlay) {
@@ -242,7 +249,11 @@ export function createOverlayController(
     updateOverlayPosition(activeOverlay, rect);
 
     const instance = identifyComponent(el);
+    const fallback = !instance && domFileResolver ? domFileResolver(el) : null;
     const metadata = extractMetadata(instance, el);
+    if (fallback?.file) metadata.file = fallback.file;
+    if (typeof fallback?.line === 'number') metadata.line = fallback.line;
+    if (typeof fallback?.column === 'number') metadata.column = fallback.column;
     const label = formatLocation(metadata, options?.rootDir);
     if (label) {
       activeTooltip.textContent = label;
@@ -259,7 +270,11 @@ export function createOverlayController(
     event.stopPropagation();
     const el = event.target as HTMLElement | null;
     const instance = identifyComponent(el);
-    const metadata = extractMetadata(instance);
+    const fallback = !instance && domFileResolver ? domFileResolver(el) : null;
+    const metadata = extractMetadata(instance, el);
+    if (fallback?.file) metadata.file = fallback.file;
+    if (typeof fallback?.line === 'number') metadata.line = fallback.line;
+    if (typeof fallback?.column === 'number') metadata.column = fallback.column;
     const payload = serializeMetadata(metadata);
 
     const activeTooltip = ensureTooltip();
@@ -325,6 +340,9 @@ export function createOverlayController(
       for (const [key, value] of Object.entries(style)) {
         (overlay.style as any)[key] = value;
       }
+    },
+    setDomFileResolver(resolver: OverlayOptions['domFileResolver']) {
+      domFileResolver = resolver ?? null;
     }
   };
 }

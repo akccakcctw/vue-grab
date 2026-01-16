@@ -37,7 +37,8 @@ export function createVueGrabPlugin(options: VueGrabPluginOptions = {}) {
           overlayStyle: options.overlayStyle,
           onCopy: options.onCopy,
           copyOnClick: options.copyOnClick,
-          rootDir: options.rootDir
+          rootDir: options.rootDir,
+          domFileResolver: options.domFileResolver
         });
       }
     }

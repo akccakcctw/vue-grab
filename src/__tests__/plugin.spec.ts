@@ -26,7 +26,8 @@ describe('Vue plugin', () => {
       enable: vi.fn(),
       disable: vi.fn(),
       getComponentDetails: vi.fn(),
-      setOverlayStyle: vi.fn()
+      setOverlayStyle: vi.fn(),
+      setDomFileResolver: vi.fn()
     })
     const onCopy = vi.fn()
 

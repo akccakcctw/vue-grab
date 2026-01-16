@@ -28,12 +28,22 @@ export interface VueGrabAPI {
   disable(): void;
   getComponentDetails(selectorOrElement: string | Element): ComponentInfo | null;
   setOverlayStyle(style: Record<string, string>): void;
+  setDomFileResolver(
+    resolver: VueGrabOptions['domFileResolver']
+  ): void;
 }
 
-function getComponentInfo(el: HTMLElement | null): ComponentInfo | null {
+function getComponentInfo(
+  el: HTMLElement | null,
+  resolver?: VueGrabOptions['domFileResolver']
+): ComponentInfo | null {
   if (!el) return null;
   const instance = identifyComponent(el);
+  const fallback = !instance && resolver ? resolver(el) : null;
   const metadata = extractMetadata(instance, el);
+  if (fallback?.file) metadata.file = fallback.file;
+  if (typeof fallback?.line === 'number') metadata.line = fallback.line;
+  if (typeof fallback?.column === 'number') metadata.column = fallback.column;
   if (!metadata) return null;
 
   return {
@@ -47,6 +57,7 @@ export function createVueGrabAPI(
   options: VueGrabOptions = {}
 ): VueGrabAPI {
   let active = false;
+  let domFileResolver = options.domFileResolver ?? null;
   const overlay = createOverlayController(targetWindow, {
     ...options,
     onAfterCopy: () => {
@@ -80,14 +91,14 @@ export function createVueGrabAPI(
     grabAt(x: number, y: number) {
       if (typeof targetWindow.document.elementFromPoint !== 'function') return null;
       const el = targetWindow.document.elementFromPoint(x, y) as HTMLElement | null;
-      return getComponentInfo(el);
+      return getComponentInfo(el, domFileResolver);
     },
     grabFromSelector(selector: string) {
       const el = targetWindow.document.querySelector(selector) as HTMLElement | null;
-      return getComponentInfo(el);
+      return getComponentInfo(el, domFileResolver);
     },
     grabFromElement(element: Element) {
-      return getComponentInfo(element as HTMLElement);
+      return getComponentInfo(element as HTMLElement, domFileResolver);
     },
     highlight(selector: string) {
       const el = targetWindow.document.querySelector(selector) as HTMLElement | null;
@@ -104,12 +115,16 @@ export function createVueGrabAPI(
         const el = targetWindow.document.querySelector(selectorOrElement) as
           | HTMLElement
           | null;
-        return getComponentInfo(el);
+        return getComponentInfo(el, domFileResolver);
       }
-      return getComponentInfo(selectorOrElement as HTMLElement);
+      return getComponentInfo(selectorOrElement as HTMLElement, domFileResolver);
     },
     setOverlayStyle(style: Record<string, string>) {
       overlay.setStyle(style);
+    },
+    setDomFileResolver(resolver: VueGrabOptions['domFileResolver']) {
+      domFileResolver = resolver ?? null;
+      overlay.setDomFileResolver(domFileResolver);
     }
   };
 
