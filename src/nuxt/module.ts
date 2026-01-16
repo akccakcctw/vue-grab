@@ -16,7 +16,8 @@ export default defineNuxtModule<VueGrabNuxtModuleOptions>({
   },
   setup(options, nuxt) {
     if (options.enabled === false) return;
-    if (!nuxt.options.dev) return;
+    const shouldEnable = nuxt.options.dev || options.enabled === true;
+    if (!shouldEnable) return;
 
     const publicConfig = (nuxt.options.runtimeConfig.public ||= {});
     const { enabled, overlayStyle, copyOnClick } = options;
@@ -26,6 +27,11 @@ export default defineNuxtModule<VueGrabNuxtModuleOptions>({
       overlayStyle,
       copyOnClick
     };
+
+    nuxt.options.build.transpile = nuxt.options.build.transpile || [];
+    if (!nuxt.options.build.transpile.includes('vue-grab')) {
+      nuxt.options.build.transpile.push('vue-grab');
+    }
 
     const resolver = createResolver(import.meta.url);
     addPlugin(resolver.resolve('./runtime/plugin'));
