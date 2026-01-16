@@ -6,6 +6,8 @@ This document provides instructions for AI agents on how to utilize `vue-grab` t
 
 `vue-grab` exposes a global bridge in the browser's `window` object that allows you to query the internal structure of a Vue application directly from the DOM. This is particularly useful when combined with `chrome-devtools-mcp`.
 
+Quickstart: see `README.md` for Vue/Nuxt install examples.
+
 ## 2. Global API Bridge
 
 When `vue-grab` is active in a development environment, it exposes `window.__VUE_GRAB__`.

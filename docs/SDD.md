@@ -149,3 +149,33 @@ We will follow Test-Driven Development.
 
 4.  **Phase 4: MCP Verification**
     *   Simulate MCP calls to ensure the API returns data in the expected format.
+
+## 7. Quickstart
+
+### 7.1 Vue
+```ts
+import { createApp } from 'vue'
+import VueGrab from 'vue-grab'
+
+const app = createApp(App)
+if (process.env.NODE_ENV === 'development') {
+  app.use(VueGrab)
+}
+app.mount('#app')
+```
+
+### 7.2 Nuxt
+```ts
+export default defineNuxtConfig({
+  modules: ['vue-grab'],
+  vueGrab: {
+    enabled: true
+  }
+})
+```
+
+### 7.3 Browser API
+```js
+const info = window.__VUE_GRAB__.grabFromSelector('.my-button');
+console.log(JSON.stringify(info));
+```
