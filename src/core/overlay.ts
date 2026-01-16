@@ -44,6 +44,29 @@ function updateOverlayPosition(overlay: HTMLDivElement, rect: DOMRect) {
   overlay.style.height = `${rect.height}px`;
 }
 
+function isVueComponentProxy(value: unknown) {
+  if (!value || typeof value !== 'object') return false;
+  return (
+    '$el' in value ||
+    '$props' in value ||
+    '$data' in value ||
+    '__v_isVNode' in value ||
+    '__isVue' in value
+  );
+}
+
+function cloneVnode(value: Record<string, unknown>, seen: WeakSet<object>, depth: number) {
+  return {
+    type: safeClone(value.type, seen, depth - 1),
+    key: safeClone(value.key, seen, depth - 1),
+    props: safeClone(value.props, seen, depth - 1),
+    children: safeClone(value.children, seen, depth - 1),
+    el: safeClone(value.el, seen, depth - 1),
+    shapeFlag: safeClone(value.shapeFlag, seen, depth - 1),
+    patchFlag: safeClone(value.patchFlag, seen, depth - 1)
+  };
+}
+
 function safeClone(value: unknown, seen: WeakSet<object>, depth: number): unknown {
   if (depth <= 0) return '[DepthLimit]';
   if (value === null || typeof value !== 'object') return value;
@@ -66,6 +89,10 @@ function safeClone(value: unknown, seen: WeakSet<object>, depth: number): unknow
   if (tag === '[object HTMLCollection]') return '[HTMLCollection]';
   if (tag === '[object NodeList]') return '[NodeList]';
   if (tag.startsWith('[object HTML')) return '[HTMLElement]';
+  if ((value as Record<string, unknown>).__v_isVNode) {
+    return cloneVnode(value as Record<string, unknown>, seen, depth);
+  }
+  if (isVueComponentProxy(value)) return '[VueComponent]';
 
   if (Array.isArray(value)) {
     return value.slice(0, 20).map((item) => safeClone(item, seen, depth - 1));

@@ -214,4 +214,34 @@ describe('Overlay controller', () => {
     expect(payload).toContain('[DepthLimit]')
     controller.stop()
   })
+
+  it('serializes vnode without component proxy', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    const vnode = {
+      __v_isVNode: true,
+      type: 'div',
+      component: { $el: target },
+      props: { id: 'test' }
+    }
+
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'VNodeComponent',
+        __file: '/abs/path/to/VNodeComponent.vue'
+      },
+      vnode
+    }
+
+    const onCopy = vi.fn()
+    const controller = createOverlayController(window, { onCopy })
+    controller.start()
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    const payload = onCopy.mock.calls[0][0] as string
+    expect(payload).toContain('"props"')
+    controller.stop()
+  })
 })
