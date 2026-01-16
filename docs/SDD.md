@@ -51,10 +51,11 @@ We will traverse the fiber/component tree to find the nearest component boundary
 To allow `chrome-devtools-mcp` (which uses Puppeteer) to interact with `vue-grab`, we will expose a global object on the window: `window.__VUE_GRAB__`.
 
 **Contract:**
-*   `window.__VUE_GRAB__.enable()`: Turn on inspection mode.
-*   `window.__VUE_GRAB__.disable()`: Turn off inspection mode.
-*   `window.__VUE_GRAB__.getComponentDetails(selectorOrElement)`: Return a JSON object with component info.
+*   `window.__VUE_GRAB__.activate()`: Turn on inspection mode.
+*   `window.__VUE_GRAB__.deactivate()`: Turn off inspection mode.
+*   `window.__VUE_GRAB__.grabFromSelector(selector)`: Return a JSON object with component info.
 *   `window.__VUE_GRAB__.highlight(selector)`: Programmatically highlight an element.
+*   `window.__VUE_GRAB__.enable()`/`disable()` and `getComponentDetails(...)` are supported as aliases.
 
 ## 4. API Design
 

@@ -102,4 +102,20 @@ describe('VueGrab API', () => {
     const api2 = installVueGrab(window)
     expect(api1).toBe(api2)
   })
+
+  it('supports legacy alias methods', () => {
+    const wrapper = mount(TestComponent, {
+      attachTo: document.body
+    })
+    const api = createVueGrabAPI(window)
+    api.enable()
+    expect(api.isActive).toBe(true)
+    api.disable()
+    expect(api.isActive).toBe(false)
+    const info = api.getComponentDetails('.target')
+    expect(info?.name).toBe('TestComponent')
+    const infoByEl = api.getComponentDetails(wrapper.find('.target').element)
+    expect(infoByEl?.name).toBe('TestComponent')
+    wrapper.unmount()
+  })
 })

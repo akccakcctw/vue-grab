@@ -19,6 +19,9 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
 | `activate()` | Enable visual inspection mode (highlights on hover). | N/A | `void` |
 | `deactivate()` | Disable visual inspection mode. | N/A | `void` |
 | `highlight(selector)` | Programmatically highlight an element. | `selector: string` | `void` |
+| `enable()` | Alias for `activate()`. | N/A | `void` |
+| `disable()` | Alias for `deactivate()`. | N/A | `void` |
+| `getComponentDetails(selectorOrElement)` | Alias for grab via selector or element. | `selectorOrElement: string \| Element` | `ComponentInfo \| null` |
 
 ### Data Structures
 
