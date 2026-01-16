@@ -8,6 +8,12 @@ type ToggleWidgetController = {
   setActive: (active: boolean) => void;
 };
 
+type DragState = {
+  dragging: boolean;
+  offsetX: number;
+  offsetY: number;
+};
+
 function createButton(targetWindow: Window) {
   const button = targetWindow.document.createElement('button');
   button.type = 'button';
@@ -41,6 +47,39 @@ export function createToggleWidget(
 ): ToggleWidgetController {
   let button: HTMLButtonElement | null = null;
   let mounted = false;
+  const dragState: DragState = {
+    dragging: false,
+    offsetX: 0,
+    offsetY: 0
+  };
+
+  const startDrag = (event: MouseEvent) => {
+    if (!button) return;
+    dragState.dragging = true;
+    const rect = button.getBoundingClientRect();
+    dragState.offsetX = event.clientX - rect.left;
+    dragState.offsetY = event.clientY - rect.top;
+    button.style.right = 'auto';
+    button.style.bottom = 'auto';
+    button.style.left = `${rect.left}px`;
+    button.style.top = `${rect.top}px`;
+  };
+
+  const onDrag = (event: MouseEvent) => {
+    if (!button || !dragState.dragging) return;
+    const nextLeft = event.clientX - dragState.offsetX;
+    const nextTop = event.clientY - dragState.offsetY;
+    const maxLeft = targetWindow.innerWidth - button.offsetWidth;
+    const maxTop = targetWindow.innerHeight - button.offsetHeight;
+    const clampedLeft = Math.max(0, Math.min(maxLeft, nextLeft));
+    const clampedTop = Math.max(0, Math.min(maxTop, nextTop));
+    button.style.left = `${clampedLeft}px`;
+    button.style.top = `${clampedTop}px`;
+  };
+
+  const endDrag = () => {
+    dragState.dragging = false;
+  };
 
   return {
     mount() {
@@ -48,18 +87,24 @@ export function createToggleWidget(
       mounted = true;
       button = createButton(targetWindow);
       setButtonState(button, false);
+      button.addEventListener('mousedown', startDrag);
       button.addEventListener('click', (event) => {
         event.preventDefault();
         const nextActive = button?.textContent !== 'Vue Grab: ON';
         options.onToggle(nextActive);
       });
+      targetWindow.addEventListener('mousemove', onDrag);
+      targetWindow.addEventListener('mouseup', endDrag);
       targetWindow.document.body.appendChild(button);
     },
     unmount() {
       if (!mounted) return;
       mounted = false;
+      button?.removeEventListener('mousedown', startDrag);
       button?.remove();
       button = null;
+      targetWindow.removeEventListener('mousemove', onDrag);
+      targetWindow.removeEventListener('mouseup', endDrag);
     },
     setActive(active: boolean) {
       if (!button) return;
