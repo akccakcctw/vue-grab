@@ -120,6 +120,8 @@ export function createOverlayController(
 
   const handleClick = (event: MouseEvent) => {
     if (options?.copyOnClick === false) return;
+    event.preventDefault();
+    event.stopPropagation();
     const el = event.target as HTMLElement | null;
     const instance = identifyComponent(el);
     const metadata = extractMetadata(instance);
