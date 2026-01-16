@@ -12,13 +12,13 @@ pnpm add -D @akccakcctw/vue-grab
 
 ```ts
 import { createApp } from 'vue'
-import VueGrab from 'vue-grab'
+import { createVueGrabPlugin } from '@akccakcctw/vue-grab'
 
 const app = createApp(App)
 
 // Use import.meta.env.DEV for Vite, or process.env.NODE_ENV === 'development' for Webpack
 if (import.meta.env.DEV) {
-  app.use(VueGrab, {
+  app.use(createVueGrabPlugin({
     overlayStyle: {
       border: '2px dashed #111'
     },
@@ -26,7 +26,7 @@ if (import.meta.env.DEV) {
       console.log('vue-grab payload', payload)
     },
     copyOnClick: true
-  })
+  }))
 }
 
 app.mount('#app')
@@ -36,7 +36,7 @@ app.mount('#app')
 
 ```ts
 export default defineNuxtConfig({
-  modules: ['vue-grab'],
+  modules: ['@akccakcctw/vue-grab'],
   vueGrab: {
     enabled: true,
     overlayStyle: {
@@ -102,7 +102,7 @@ Cleanup when finished:
 
 ```bash
 # In your app repo
-pnpm unlink --global vue-grab
+pnpm unlink --global @akccakcctw/vue-grab
 ```
 
 Manual verification checklist:
