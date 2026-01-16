@@ -33,7 +33,7 @@ function createToolbar(targetWindow: Window) {
     userSelect: 'none',
     cursor: 'grab',
     filter: 'drop-shadow(0px 0px 4px rgba(81, 81, 81, 0.5))',
-    transition: 'opacity 300ms ease-out',
+    transition: 'opacity 300ms ease-out, padding 0.2s ease',
     opacity: '1',
   });
   container.setAttribute('data-vue-grab-toolbar', '');
@@ -48,6 +48,7 @@ function createToolbar(targetWindow: Window) {
     backgroundColor: 'white',
     gap: '6px',
     padding: '6px 8px',
+    transition: 'gap 0.2s ease, padding 0.2s ease',
   });
   
   // Toggle Button Wrapper
@@ -132,6 +133,8 @@ export function createToggleWidget(
     right: '',
     bottom: ''
   };
+  const defaultInnerGap = '6px';
+  const defaultInnerPadding = '6px 8px';
   const dragState: DragState = {
     dragging: false,
     offsetX: 0,
@@ -182,6 +185,7 @@ export function createToggleWidget(
   const toggleCollapse = () => {
     if (!elements) return;
     const { container, toggleWrapper, collapseBtn } = elements;
+    const inner = container.firstElementChild as HTMLDivElement | null;
     const svg = collapseBtn.querySelector('svg') as SVGElement | null;
 
     if (!isCollapsed) {
@@ -203,9 +207,14 @@ export function createToggleWidget(
       }
       container.style.bottom = 'auto';
       container.style.transform = 'scale(0.8)';
+      container.style.padding = '0';
       toggleWrapper.style.maxWidth = '0px';
       toggleWrapper.style.opacity = '0';
       toggleWrapper.style.pointerEvents = 'none';
+      if (inner) {
+        inner.style.gap = '0';
+        inner.style.padding = '6px';
+      }
       if (svg) svg.style.transform = 'rotate(0deg)';
       isCollapsed = true;
     } else {
@@ -214,9 +223,14 @@ export function createToggleWidget(
       container.style.right = lastPosition.right;
       container.style.bottom = lastPosition.bottom;
       container.style.transform = 'scale(1)';
+      container.style.padding = '';
       toggleWrapper.style.maxWidth = '200px';
       toggleWrapper.style.opacity = '1';
       toggleWrapper.style.pointerEvents = 'auto';
+      if (inner) {
+        inner.style.gap = defaultInnerGap;
+        inner.style.padding = defaultInnerPadding;
+      }
       if (svg) svg.style.transform = 'rotate(180deg)';
       isCollapsed = false;
     }
