@@ -182,4 +182,36 @@ describe('Overlay controller', () => {
     expect(onCopy).toHaveBeenCalledTimes(1)
     controller.stop()
   })
+
+  it('limits depth and size to avoid huge payloads', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    const large: any = {}
+    let curr = large
+    for (let i = 0; i < 20; i += 1) {
+      curr.next = { value: i }
+      curr = curr.next
+    }
+
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'LargeComponent',
+        __file: '/abs/path/to/LargeComponent.vue'
+      },
+      props: {
+        data: large
+      }
+    }
+
+    const onCopy = vi.fn()
+    const controller = createOverlayController(window, { onCopy })
+    controller.start()
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    const payload = onCopy.mock.calls[0][0] as string
+    expect(payload).toContain('[DepthLimit]')
+    controller.stop()
+  })
 })

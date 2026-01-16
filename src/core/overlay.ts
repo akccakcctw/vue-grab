@@ -44,7 +44,8 @@ function updateOverlayPosition(overlay: HTMLDivElement, rect: DOMRect) {
   overlay.style.height = `${rect.height}px`;
 }
 
-function safeClone(value: unknown, seen: WeakSet<object>): unknown {
+function safeClone(value: unknown, seen: WeakSet<object>, depth: number): unknown {
+  if (depth <= 0) return '[DepthLimit]';
   if (value === null || typeof value !== 'object') return value;
   if (typeof value === 'function') {
     const name = value.name ? ` ${value.name}` : '';
@@ -62,22 +63,25 @@ function safeClone(value: unknown, seen: WeakSet<object>): unknown {
 
   if (tag === '[object Window]') return '[Window]';
   if (tag === '[object Document]') return '[Document]';
+  if (tag === '[object HTMLCollection]') return '[HTMLCollection]';
+  if (tag === '[object NodeList]') return '[NodeList]';
+  if (tag.startsWith('[object HTML')) return '[HTMLElement]';
 
   if (Array.isArray(value)) {
-    return value.map((item) => safeClone(item, seen));
+    return value.slice(0, 20).map((item) => safeClone(item, seen, depth - 1));
   }
 
   const result: Record<string, unknown> = {};
   let keys: string[] = [];
   try {
-    keys = Object.keys(value as object);
+    keys = Object.keys(value as object).slice(0, 50);
   } catch {
     return '[Unserializable]';
   }
   for (const key of keys) {
     try {
       const item = (value as Record<string, unknown>)[key];
-      result[key] = safeClone(item, seen);
+      result[key] = safeClone(item, seen, depth - 1);
     } catch {
       result[key] = '[Unserializable]';
     }
@@ -86,7 +90,7 @@ function safeClone(value: unknown, seen: WeakSet<object>): unknown {
 }
 
 function safeStringify(value: unknown) {
-  const cloned = safeClone(value ?? {}, new WeakSet());
+  const cloned = safeClone(value ?? {}, new WeakSet(), 5);
   return JSON.stringify(cloned, null, 2);
 }
 
