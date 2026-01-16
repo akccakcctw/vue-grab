@@ -96,14 +96,17 @@ A simple Vue plugin `VueGrab` that installs the global handler and sets up the e
 ```javascript
 import { createApp } from 'vue'
 import VueGrab from 'vue-grab'
+import type { VueGrabOptions } from 'vue-grab'
+
+const vueGrabOptions: VueGrabOptions = {
+  overlayStyle: {
+    border: '2px dashed #111'
+  }
+}
 
 const app = createApp(App)
 if (process.env.NODE_ENV === 'development') {
-  app.use(VueGrab, {
-    overlayStyle: {
-      border: '2px dashed #111'
-    }
-  })
+  app.use(VueGrab, vueGrabOptions)
 }
 app.mount('#app')
 ```

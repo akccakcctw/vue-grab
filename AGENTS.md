@@ -64,3 +64,4 @@ Configuration: `vueGrab` accepts `enabled` and optional `overlayStyle` (CSS styl
 *   **Absolute Paths:** `vue-grab` provides absolute file paths in development mode, allowing you to immediately open the correct file without guessing.
 *   **Anonymous Components:** If a component doesn't have a name, `vue-grab` defaults to `AnonymousComponent`. Try to look at the `file` property to identify it.
 *   **Package Manager:** Use `pnpm` instead of `npm` for all package scripts and installs.
+*   **Types:** `VueGrabOptions`, `OverlayOptions`, and `OverlayStyle` are exported from the package.
