@@ -158,4 +158,28 @@ describe('Overlay controller', () => {
     expect(onCopy).toHaveBeenCalledTimes(1)
     controller.stop()
   })
+
+  it('handles window references in metadata', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'WindowComponent',
+        __file: '/abs/path/to/WindowComponent.vue'
+      },
+      props: {
+        win: window
+      }
+    }
+
+    const onCopy = vi.fn()
+    const controller = createOverlayController(window, { onCopy })
+    controller.start()
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    expect(onCopy).toHaveBeenCalledTimes(1)
+    controller.stop()
+  })
 })

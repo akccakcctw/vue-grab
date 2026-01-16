@@ -44,23 +44,50 @@ function updateOverlayPosition(overlay: HTMLDivElement, rect: DOMRect) {
   overlay.style.height = `${rect.height}px`;
 }
 
+function safeClone(value: unknown, seen: WeakSet<object>): unknown {
+  if (value === null || typeof value !== 'object') return value;
+  if (typeof value === 'function') {
+    const name = value.name ? ` ${value.name}` : '';
+    return `[Function${name}]`;
+  }
+  if (seen.has(value)) return '[Circular]';
+  seen.add(value);
+
+  let tag = '[object Object]';
+  try {
+    tag = Object.prototype.toString.call(value);
+  } catch {
+    return '[Unserializable]';
+  }
+
+  if (tag === '[object Window]') return '[Window]';
+  if (tag === '[object Document]') return '[Document]';
+
+  if (Array.isArray(value)) {
+    return value.map((item) => safeClone(item, seen));
+  }
+
+  const result: Record<string, unknown> = {};
+  let keys: string[] = [];
+  try {
+    keys = Object.keys(value as object);
+  } catch {
+    return '[Unserializable]';
+  }
+  for (const key of keys) {
+    try {
+      const item = (value as Record<string, unknown>)[key];
+      result[key] = safeClone(item, seen);
+    } catch {
+      result[key] = '[Unserializable]';
+    }
+  }
+  return result;
+}
+
 function safeStringify(value: unknown) {
-  const seen = new WeakSet();
-  return JSON.stringify(
-    value ?? {},
-    (_key, val) => {
-      if (typeof val === 'function') {
-        const name = val.name ? ` ${val.name}` : '';
-        return `[Function${name}]`;
-      }
-      if (typeof val === 'object' && val !== null) {
-        if (seen.has(val)) return '[Circular]';
-        seen.add(val);
-      }
-      return val;
-    },
-    2
-  );
+  const cloned = safeClone(value ?? {}, new WeakSet());
+  return JSON.stringify(cloned, null, 2);
 }
 
 function serializeMetadata(metadata: ReturnType<typeof extractMetadata>) {
