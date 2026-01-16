@@ -42,7 +42,7 @@ describe('Component Identifier', () => {
     const instance = identifyComponent(el)
     const metadata = extractMetadata(instance)
     
-    expect(metadata).toEqual({
+    expect(metadata).toMatchObject({
       name: 'TestComponent',
       file: '/abs/path/to/TestComponent.vue',
       props: {
@@ -51,6 +51,33 @@ describe('Component Identifier', () => {
       data: {
         count: 0
       }
+    })
+  })
+
+  it('includes vnode and location data when available', () => {
+    const instance = {
+      type: {
+        name: 'MockComponent',
+        __file: '/abs/path/to/MockComponent.vue'
+      },
+      vnode: {
+        loc: {
+          start: {
+            line: 12,
+            column: 8
+          }
+        }
+      }
+    }
+
+    const metadata = extractMetadata(instance)
+
+    expect(metadata).toMatchObject({
+      name: 'MockComponent',
+      file: '/abs/path/to/MockComponent.vue',
+      line: 12,
+      column: 8,
+      vnode: instance.vnode
     })
   })
 })

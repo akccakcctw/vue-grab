@@ -49,7 +49,7 @@ describe('VueGrab API', () => {
     const api = createVueGrabAPI(window)
     const info = api.grabFromSelector('.target')
 
-    expect(info).toEqual({
+    expect(info).toMatchObject({
       name: 'TestComponent',
       file: '/abs/path/to/TestComponent.vue',
       props: {

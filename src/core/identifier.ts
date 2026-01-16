@@ -26,11 +26,25 @@ export function extractMetadata(instance: any) {
       : instance.setupState) ||
     instance.$data ||
     {};
+  const vnode = instance.vnode || instance.$vnode;
+  const loc = vnode?.loc?.start;
 
-  return {
+  const metadata: Record<string, any> = {
     name: type.name || type.__name || 'AnonymousComponent',
     file: type.__file || 'unknown',
     props,
     data
   };
+
+  if (typeof loc?.line === 'number') {
+    metadata.line = loc.line;
+  }
+  if (typeof loc?.column === 'number') {
+    metadata.column = loc.column;
+  }
+  if (vnode) {
+    metadata.vnode = vnode;
+  }
+
+  return metadata;
 }

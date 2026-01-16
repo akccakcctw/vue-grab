@@ -7,6 +7,9 @@ export interface ComponentInfo {
   props: Record<string, any>;
   data: Record<string, any>;
   element: HTMLElement;
+  line?: number;
+  column?: number;
+  vnode?: any;
 }
 
 export interface VueGrabAPI {
