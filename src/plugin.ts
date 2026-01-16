@@ -23,7 +23,8 @@ export function createVueGrabPlugin(options: VueGrabPluginOptions = {}) {
       if (enabled && typeof window !== 'undefined') {
         installVueGrab(window, {
           overlayStyle: options.overlayStyle,
-          onCopy: options.onCopy
+          onCopy: options.onCopy,
+          copyOnClick: options.copyOnClick
         });
       }
     }

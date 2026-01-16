@@ -35,7 +35,8 @@ describe('Vue plugin', () => {
       overlayStyle: {
         border: '1px solid red'
       },
-      onCopy
+      onCopy,
+      copyOnClick: false
     })
     plugin.install()
 
@@ -44,7 +45,8 @@ describe('Vue plugin', () => {
       overlayStyle: {
         border: '1px solid red'
       },
-      onCopy
+      onCopy,
+      copyOnClick: false
     })
   })
 

@@ -107,4 +107,25 @@ describe('Overlay controller', () => {
     expect(onCopy).toHaveBeenCalledTimes(1)
     controller.stop()
   })
+
+  it('skips copy on click when disabled', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true
+    })
+
+    const controller = createOverlayController(window, {
+      copyOnClick: false
+    })
+    controller.start()
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+    expect(writeText).not.toHaveBeenCalled()
+    controller.stop()
+  })
 })

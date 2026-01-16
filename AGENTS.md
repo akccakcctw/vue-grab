@@ -62,7 +62,7 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
 
 ## 4. Nuxt Support
 In Nuxt applications, `vue-grab` is automatically injected via a Nuxt Module. The API remains identical.
-Configuration: `vueGrab` accepts `enabled` and optional `overlayStyle` (CSS style map).
+Configuration: `vueGrab` accepts `enabled`, optional `overlayStyle` (CSS style map), and `copyOnClick`.
 
 Note: `onCopy` is only supported when using the Vue plugin directly.
 

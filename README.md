@@ -23,7 +23,8 @@ if (process.env.NODE_ENV === 'development') {
     },
     onCopy(payload) {
       console.log('vue-grab payload', payload)
-    }
+    },
+    copyOnClick: true
   })
 }
 
@@ -39,7 +40,8 @@ export default defineNuxtConfig({
     enabled: true,
     overlayStyle: {
       border: '2px dashed #111'
-    }
+    },
+    copyOnClick: true
   }
 })
 ```

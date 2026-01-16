@@ -14,6 +14,7 @@ export type OverlayStyle = Record<string, string>;
 export type OverlayOptions = {
   overlayStyle?: OverlayStyle;
   onCopy?: (payload: string) => void;
+  copyOnClick?: boolean;
 };
 
 function createOverlayElement(targetWindow: Window, options?: OverlayOptions) {
@@ -99,6 +100,7 @@ export function createOverlayController(
   };
 
   const handleClick = (event: MouseEvent) => {
+    if (options?.copyOnClick === false) return;
     const el = event.target as HTMLElement | null;
     const instance = identifyComponent(el);
     const metadata = extractMetadata(instance);
