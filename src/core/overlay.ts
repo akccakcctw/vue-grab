@@ -4,6 +4,8 @@ type OverlayController = {
   start: () => void;
   stop: () => void;
   isActive: () => boolean;
+  highlight: (el: HTMLElement | null) => void;
+  clear: () => void;
 };
 
 function createOverlayElement(targetWindow: Window) {
@@ -55,18 +57,26 @@ export function createOverlayController(targetWindow: Window): OverlayController
   let overlay: HTMLDivElement | null = null;
   let active = false;
 
+  const ensureOverlay = () => {
+    if (!overlay) {
+      overlay = createOverlayElement(targetWindow);
+      targetWindow.document.body.appendChild(overlay);
+    }
+    return overlay;
+  };
+
   const handleMove = (event: MouseEvent) => {
-    if (!overlay) return;
+    const activeOverlay = ensureOverlay();
     const el = targetWindow.document.elementFromPoint(event.clientX, event.clientY) as
       | HTMLElement
       | null;
     if (!el) {
-      overlay.style.width = '0';
-      overlay.style.height = '0';
+      activeOverlay.style.width = '0';
+      activeOverlay.style.height = '0';
       return;
     }
     const rect = el.getBoundingClientRect();
-    updateOverlayPosition(overlay, rect);
+    updateOverlayPosition(activeOverlay, rect);
   };
 
   const handleClick = (event: MouseEvent) => {
@@ -80,8 +90,7 @@ export function createOverlayController(targetWindow: Window): OverlayController
     start() {
       if (active) return;
       active = true;
-      overlay = createOverlayElement(targetWindow);
-      targetWindow.document.body.appendChild(overlay);
+      ensureOverlay();
       targetWindow.document.addEventListener('mousemove', handleMove);
       targetWindow.document.addEventListener('click', handleClick);
     },
@@ -95,6 +104,20 @@ export function createOverlayController(targetWindow: Window): OverlayController
     },
     isActive() {
       return active;
+    },
+    highlight(el: HTMLElement | null) {
+      if (!el) {
+        this.clear();
+        return;
+      }
+      const activeOverlay = ensureOverlay();
+      const rect = el.getBoundingClientRect();
+      updateOverlayPosition(activeOverlay, rect);
+    },
+    clear() {
+      if (!overlay) return;
+      overlay.style.width = '0';
+      overlay.style.height = '0';
     }
   };
 }

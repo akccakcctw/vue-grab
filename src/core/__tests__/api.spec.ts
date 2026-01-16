@@ -25,6 +25,9 @@ const TestComponent = defineComponent({
 describe('VueGrab API', () => {
   afterEach(() => {
     delete (window as any).__VUE_GRAB__
+    const overlay = document.querySelector('[data-vue-grab-overlay="true"]')
+    overlay?.remove()
+    document.body.innerHTML = ''
   })
 
   it('tracks activation state', () => {
@@ -57,6 +60,16 @@ describe('VueGrab API', () => {
       },
       element: wrapper.find('.target').element
     })
+    wrapper.unmount()
+  })
+
+  it('highlights an element from selector', () => {
+    const wrapper = mount(TestComponent, {
+      attachTo: document.body
+    })
+    const api = createVueGrabAPI(window)
+    api.highlight('.target')
+    expect(document.querySelector('[data-vue-grab-overlay="true"]')).toBeTruthy()
     wrapper.unmount()
   })
 

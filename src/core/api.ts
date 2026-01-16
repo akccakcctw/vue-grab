@@ -15,6 +15,7 @@ export interface VueGrabAPI {
   readonly isActive: boolean;
   grabAt(x: number, y: number): ComponentInfo | null;
   grabFromSelector(selector: string): ComponentInfo | null;
+  highlight(selector: string): void;
 }
 
 function getComponentInfo(el: HTMLElement | null): ComponentInfo | null {
@@ -53,6 +54,10 @@ export function createVueGrabAPI(targetWindow: Window): VueGrabAPI {
     grabFromSelector(selector: string) {
       const el = targetWindow.document.querySelector(selector) as HTMLElement | null;
       return getComponentInfo(el);
+    },
+    highlight(selector: string) {
+      const el = targetWindow.document.querySelector(selector) as HTMLElement | null;
+      overlay.highlight(el);
     }
   };
 }

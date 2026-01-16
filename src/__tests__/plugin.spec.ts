@@ -20,7 +20,8 @@ describe('Vue plugin', () => {
       deactivate: vi.fn(),
       isActive: false,
       grabAt: vi.fn(),
-      grabFromSelector: vi.fn()
+      grabFromSelector: vi.fn(),
+      highlight: vi.fn()
     })
 
     const plugin = createVueGrabPlugin({ enabled: true })
