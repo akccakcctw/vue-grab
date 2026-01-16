@@ -89,9 +89,12 @@ function formatLocation(metadata: ReturnType<typeof extractMetadata>, rootDir?: 
     if (metadata.file.includes('/src/')) return metadata.file.split('/src/')[1];
     return metadata.file;
   })();
-  const line = typeof metadata.line === 'number' ? metadata.line : 0;
-  const column = typeof metadata.column === 'number' ? metadata.column : 0;
-  return `${file}:${line}:${column}`;
+  const line = typeof metadata.line === 'number' ? metadata.line : null;
+  const column = typeof metadata.column === 'number' ? metadata.column : null;
+  if (line !== null && column !== null) {
+    return `${file}:${line}:${column}`;
+  }
+  return file;
 }
 
 function isVueComponentProxy(value: unknown) {
