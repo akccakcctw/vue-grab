@@ -84,6 +84,15 @@ pnpm link --global
 pnpm link --global vue-grab
 ```
 
+Note: `pnpm link --global vue-grab` does not update your app's `package.json` by default.
+If you want it recorded in dependencies, use one of the following in your app repo:
+
+```bash
+pnpm add -D link:vue-grab
+# or
+pnpm add -D link:/Users/rex.tsou/vbox/vue-grab
+```
+
 Then run your app and verify `window.__VUE_GRAB__` in the browser console.
 
 Cleanup when finished:
