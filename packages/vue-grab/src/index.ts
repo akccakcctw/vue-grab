@@ -6,3 +6,5 @@ export { identifyComponent, extractMetadata } from './core/identifier';
 export { createOverlayController } from './core/overlay';
 export { createVueGrabPlugin } from './plugin';
 export { default } from './plugin';
+export { createVueGrabVitePlugin } from './vite';
+export type { VueGrabVitePluginOptions } from './vite';
