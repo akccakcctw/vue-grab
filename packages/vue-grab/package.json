@@ -5,8 +5,18 @@
   "main": "src/index.ts",
   "module": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./module": "./src/nuxt/module.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./module": {
+      "types": "./src/nuxt/module.ts",
+      "default": "./src/nuxt/module.ts"
+    },
+    "./vite": {
+      "types": "./src/vite.ts",
+      "default": "./vite.mjs"
+    }
   },
   "nuxt": "src/nuxt/module.ts",
   "scripts": {
