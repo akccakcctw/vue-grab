@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/vue-grab:
     devDependencies:
       '@nuxt/kit':
         specifier: ^4.2.2
@@ -32,6 +34,25 @@ importers:
       vue:
         specifier: ^3.5.26
         version: 3.5.26(typescript@5.9.3)
+
+  playground:
+    dependencies:
+      '@akccakcctw/vue-grab':
+        specifier: workspace:*
+        version: link:../packages/vue-grab
+      vue:
+        specifier: ^3.5.26
+        version: 3.5.26(typescript@5.9.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.3
+        version: 6.0.3(vite@7.3.1(jiti@2.6.1))(vue@3.5.26(typescript@5.9.3))
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.3.1
+        version: 7.3.1(jiti@2.6.1)
 
 packages:
 
