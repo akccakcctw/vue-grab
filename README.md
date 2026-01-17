@@ -47,6 +47,20 @@ export default defineNuxtConfig({
 })
 ```
 
+## Vite Line/Column Support
+
+Add the Vite plugin to inject `__file`, `__line`, and `__column` metadata into SFCs:
+
+```ts
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { createVueGrabVitePlugin } from '@akccakcctw/vue-grab'
+
+export default defineConfig({
+  plugins: [vue(), createVueGrabVitePlugin()]
+})
+```
+
 ## Browser API
 
 When active, `window.__VUE_GRAB__` exposes:
