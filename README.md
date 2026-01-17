@@ -49,7 +49,8 @@ export default defineNuxtConfig({
 
 ## Vite Line/Column Support
 
-Add the Vite plugin to inject `__file`, `__line`, and `__column` metadata into SFCs:
+Add the Vite plugin to inject `__file`, `__line`, and `__column` metadata into SFCs.
+It also annotates template DOM nodes with their original line/column so element grabs map to the template line numbers.
 
 ```ts
 import { defineConfig } from 'vite'

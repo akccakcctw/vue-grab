@@ -15,6 +15,17 @@ export function identifyComponent(el: HTMLElement | null): any {
   return null;
 }
 
+function getElementLoc(el?: HTMLElement | null) {
+  if (!el || typeof el.getAttribute !== 'function') return null;
+  const locAttr = el.getAttribute('data-vue-grab-loc');
+  if (!locAttr) return null;
+  const [lineRaw, columnRaw] = locAttr.split(':');
+  const line = Number(lineRaw);
+  const column = Number(columnRaw);
+  if (!Number.isFinite(line) || !Number.isFinite(column)) return null;
+  return { line, column };
+}
+
 export function extractMetadata(instance: any, el?: HTMLElement | null) {
   if (!instance && !el) return null;
 
@@ -41,7 +52,9 @@ export function extractMetadata(instance: any, el?: HTMLElement | null) {
     instance?.$data ||
     {};
   const vnode = instance?.vnode || instance?.$vnode;
+  const domLoc = getElementLoc(el);
   const loc =
+    domLoc ||
     vnode?.loc?.start ||
     resolved.instance?.vnode?.loc?.start ||
     resolved.instance?.parent?.vnode?.loc?.start;

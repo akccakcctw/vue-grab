@@ -81,6 +81,36 @@ describe('Component Identifier', () => {
     })
   })
 
+  it('prefers DOM element location when provided', () => {
+    const el = document.createElement('div')
+    el.setAttribute('data-vue-grab-loc', '4:7')
+    const instance = {
+      type: {
+        name: 'MockComponent',
+        __file: '/abs/path/to/MockComponent.vue',
+        __line: 12,
+        __column: 8
+      },
+      vnode: {
+        loc: {
+          start: {
+            line: 12,
+            column: 8
+          }
+        }
+      }
+    }
+
+    const metadata = extractMetadata(instance, el)
+
+    expect(metadata).toMatchObject({
+      name: 'MockComponent',
+      file: '/abs/path/to/MockComponent.vue',
+      line: 4,
+      column: 7
+    })
+  })
+
   it('falls back to parent metadata when file is missing', () => {
     const parent = {
       type: {
