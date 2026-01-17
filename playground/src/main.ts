@@ -5,10 +5,12 @@ import './style.css'
 
 const app = createApp(App)
 
-app.use(
-  createVueGrabPlugin({
-    copyOnClick: true,
-  })
-)
+if (import.meta.env.DEV) {
+  app.use(
+    createVueGrabPlugin({
+      copyOnClick: true,
+    })
+  )
+}
 
 app.mount('#app')
