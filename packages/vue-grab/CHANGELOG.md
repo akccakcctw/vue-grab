@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.2.0...vue-grab-v1.2.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* **build:** prepare dist publishing ([450c3c6](https://github.com/akccakcctw/vue-grab/commit/450c3c617a68115a4a025e27adf7ab4a4b1b8ac5))
+
 ## [1.2.0](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.1.0...vue-grab-v1.2.0) (2026-01-17)
 
 
