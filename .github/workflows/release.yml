@@ -39,5 +39,11 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @akccakcctw/vue-grab build
+      - run: |
+          cat <<'EOF' > "${RUNNER_TEMP}/npmrc"
+          registry=https://registry.npmjs.org/
+          EOF
       - run: npm publish --provenance --access public --no-git-checks
         working-directory: packages/vue-grab
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npmrc
