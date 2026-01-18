@@ -25,6 +25,84 @@ export type OverlayOptions = {
   } | null;
 };
 
+const IGNORE_EVENTS_ATTR = 'data-vue-grab-ignore-events';
+const CONTEXT_MENU_ATTR = 'data-vue-grab-context';
+const CONTEXT_MENU_ITEM_ATTR = 'data-vue-grab-context-item';
+const CONTEXT_MENU_HINT = 'Right click for options';
+
+function isIgnoredTarget(target: EventTarget | null) {
+  if (!(target instanceof Element)) return false;
+  return Boolean(target.closest(`[${IGNORE_EVENTS_ATTR}]`));
+}
+
+function createContextMenuElement(targetWindow: Window) {
+  const doc = targetWindow.document;
+  const menu = doc.createElement('div');
+  menu.setAttribute(CONTEXT_MENU_ATTR, '');
+  menu.setAttribute(IGNORE_EVENTS_ATTR, '');
+  Object.assign(menu.style, {
+    position: 'fixed',
+    zIndex: '2147483647',
+    minWidth: '140px',
+    padding: '6px 0',
+    borderRadius: '8px',
+    border: '1px solid rgba(0, 0, 0, 0.08)',
+    background: '#fff',
+    boxShadow: '0 10px 28px rgba(0, 0, 0, 0.18)',
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+    fontSize: '12px',
+    color: '#111',
+    display: 'none',
+    pointerEvents: 'auto'
+  });
+
+  const createItem = (label: string, value: string) => {
+    const item = doc.createElement('button');
+    item.type = 'button';
+    item.textContent = label;
+    item.setAttribute(CONTEXT_MENU_ITEM_ATTR, value);
+    Object.assign(item.style, {
+      display: 'block',
+      width: '100%',
+      textAlign: 'left',
+      border: 'none',
+      background: 'transparent',
+      padding: '6px 12px',
+      cursor: 'pointer',
+      color: 'inherit',
+      font: 'inherit'
+    });
+    item.addEventListener('mouseenter', () => {
+      item.style.background = 'rgba(0, 0, 0, 0.06)';
+    });
+    item.addEventListener('mouseleave', () => {
+      item.style.background = 'transparent';
+    });
+    menu.appendChild(item);
+    return item;
+  };
+
+  const copyItem = createItem('Copy', 'copy');
+  const copyHtmlItem = createItem('Copy HTML', 'copy-html');
+
+  return { menu, copyItem, copyHtmlItem };
+}
+
+function positionContextMenu(
+  menu: HTMLDivElement,
+  x: number,
+  y: number,
+  targetWindow: Window
+) {
+  const padding = 8;
+  const maxLeft = targetWindow.innerWidth - menu.offsetWidth - padding;
+  const maxTop = targetWindow.innerHeight - menu.offsetHeight - padding;
+  const left = Math.max(padding, Math.min(x, maxLeft));
+  const top = Math.max(padding, Math.min(y, maxTop));
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+}
+
 function createOverlayElement(targetWindow: Window, options?: OverlayOptions) {
   const el = targetWindow.document.createElement('div');
   el.setAttribute('data-vue-grab-overlay', 'true');
@@ -64,10 +142,25 @@ function createTooltipElement(targetWindow: Window) {
   el.style.color = '#fff';
   el.style.fontSize = '11px';
   el.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+  el.style.display = 'flex';
+  el.style.flexDirection = 'column';
+  el.style.gap = '2px';
   el.style.whiteSpace = 'nowrap';
   el.style.opacity = '0';
   el.style.transition = 'opacity 0.12s ease';
-  return el;
+
+  const primary = targetWindow.document.createElement('div');
+  primary.setAttribute('data-vue-grab-tooltip-line', 'primary');
+  primary.style.whiteSpace = 'nowrap';
+
+  const secondary = targetWindow.document.createElement('div');
+  secondary.setAttribute('data-vue-grab-tooltip-line', 'secondary');
+  secondary.style.whiteSpace = 'nowrap';
+  secondary.style.color = 'rgba(255, 255, 255, 0.65)';
+  secondary.style.fontSize = '10px';
+
+  el.append(primary, secondary);
+  return { tooltip: el, primary, secondary };
 }
 
 function updateTooltipPosition(
@@ -211,6 +304,10 @@ export function createOverlayController(
 ): OverlayController {
   let overlay: HTMLDivElement | null = null;
   let tooltip: HTMLDivElement | null = null;
+  let tooltipPrimary: HTMLDivElement | null = null;
+  let tooltipSecondary: HTMLDivElement | null = null;
+  let contextMenu: HTMLDivElement | null = null;
+  let contextMenuTarget: HTMLElement | null = null;
   let active = false;
   let overlayStyle: OverlayStyle = options?.overlayStyle ?? {};
   let domFileResolver = options?.domFileResolver;
@@ -227,13 +324,104 @@ export function createOverlayController(
 
   const ensureTooltip = () => {
     if (!tooltip) {
-      tooltip = createTooltipElement(targetWindow);
+      const created = createTooltipElement(targetWindow);
+      tooltip = created.tooltip;
+      tooltipPrimary = created.primary;
+      tooltipSecondary = created.secondary;
       targetWindow.document.body.appendChild(tooltip);
     }
     return tooltip;
   };
 
+  const setTooltipText = (primaryText: string, secondaryText?: string) => {
+    ensureTooltip();
+    if (tooltipPrimary) {
+      tooltipPrimary.textContent = primaryText;
+    }
+    if (tooltipSecondary) {
+      if (secondaryText) {
+        tooltipSecondary.textContent = secondaryText;
+        tooltipSecondary.style.display = 'block';
+      } else {
+        tooltipSecondary.textContent = '';
+        tooltipSecondary.style.display = 'none';
+      }
+    }
+  };
+
+  const ensureContextMenu = () => {
+    if (!contextMenu) {
+      const created = createContextMenuElement(targetWindow);
+      contextMenu = created.menu;
+      created.copyItem.addEventListener('click', handleMenuCopy);
+      created.copyHtmlItem.addEventListener('click', handleMenuCopyHtml);
+      targetWindow.document.body.appendChild(contextMenu);
+    }
+    return contextMenu;
+  };
+
+  const hideContextMenu = () => {
+    if (!contextMenu) return;
+    contextMenu.style.display = 'none';
+    contextMenuTarget = null;
+  };
+
+  const showContextMenu = (x: number, y: number, target: HTMLElement) => {
+    const menu = ensureContextMenu();
+    contextMenuTarget = target;
+    menu.style.display = 'block';
+    positionContextMenu(menu, x, y, targetWindow);
+  };
+
+  const resolveMetadata = (el: HTMLElement | null) => {
+    if (!el) return null;
+    const instance = identifyComponent(el);
+    const fallback = !instance && domFileResolver ? domFileResolver(el) : null;
+    const metadata = extractMetadata(instance, el);
+    if (!metadata) return null;
+    if (fallback?.file) metadata.file = fallback.file;
+    if (typeof fallback?.line === 'number') metadata.line = fallback.line;
+    if (typeof fallback?.column === 'number') metadata.column = fallback.column;
+    return metadata;
+  };
+
+  const applyCopyFeedback = () => {
+    const activeTooltip = ensureTooltip();
+    setTooltipText('Copied!');
+    activeTooltip.style.background = '#27ae60';
+  };
+
+  const finishCopy = () => {
+    if (options?.onAfterCopy) {
+      options.onAfterCopy();
+    }
+  };
+
+  const copyMetadataForElement = (el: HTMLElement | null) => {
+    const metadata = resolveMetadata(el);
+    if (!metadata) return;
+    const payload = serializeMetadata(metadata);
+    applyCopyFeedback();
+    if (options?.onCopy) {
+      options.onCopy(payload);
+      setTimeout(finishCopy, 600);
+      return;
+    }
+    void copyToClipboard(targetWindow, payload).then(() => {
+      setTimeout(finishCopy, 600);
+    });
+  };
+
+  const copyHtmlForElement = (el: HTMLElement | null) => {
+    if (!el) return;
+    applyCopyFeedback();
+    void copyToClipboard(targetWindow, el.outerHTML).then(() => {
+      setTimeout(finishCopy, 600);
+    });
+  };
+
   const handleMove = (event: MouseEvent) => {
+    if (isIgnoredTarget(event.target)) return;
     const activeOverlay = ensureOverlay();
     const activeTooltip = ensureTooltip();
     const el = targetWindow.document.elementFromPoint(event.clientX, event.clientY) as
@@ -248,19 +436,14 @@ export function createOverlayController(
     const rect = el.getBoundingClientRect();
     updateOverlayPosition(activeOverlay, rect);
 
-    const instance = identifyComponent(el);
-    const fallback = !instance && domFileResolver ? domFileResolver(el) : null;
-    const metadata = extractMetadata(instance, el);
+    const metadata = resolveMetadata(el);
     if (!metadata) {
       activeTooltip.style.opacity = '0';
       return;
     }
-    if (fallback?.file) metadata.file = fallback.file;
-    if (typeof fallback?.line === 'number') metadata.line = fallback.line;
-    if (typeof fallback?.column === 'number') metadata.column = fallback.column;
     const label = formatLocation(metadata, options?.rootDir);
     if (label) {
-      activeTooltip.textContent = label;
+      setTooltipText(label, CONTEXT_MENU_HINT);
       updateTooltipPosition(activeTooltip, rect, targetWindow);
       activeTooltip.style.opacity = '1';
     } else {
@@ -269,40 +452,53 @@ export function createOverlayController(
   };
 
   const handleClick = (event: MouseEvent) => {
+    if (contextMenu?.style.display === 'block') {
+      const target = event.target as HTMLElement | null;
+      if (!target || !contextMenu.contains(target)) {
+        event.preventDefault();
+        event.stopPropagation();
+        hideContextMenu();
+        return;
+      }
+    }
     if (options?.copyOnClick === false) return;
+    if (isIgnoredTarget(event.target)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const el = event.target as HTMLElement | null;
+    copyMetadataForElement(el);
+  };
+
+  const handleContextMenu = (event: MouseEvent) => {
+    if (isIgnoredTarget(event.target)) return;
     event.preventDefault();
     event.stopPropagation();
     const el = event.target as HTMLElement | null;
     if (!el) return;
-    const instance = identifyComponent(el);
-    const fallback = !instance && domFileResolver ? domFileResolver(el) : null;
-    const metadata = extractMetadata(instance, el);
-    if (!metadata) return;
-    if (fallback?.file) metadata.file = fallback.file;
-    if (typeof fallback?.line === 'number') metadata.line = fallback.line;
-    if (typeof fallback?.column === 'number') metadata.column = fallback.column;
-    const payload = serializeMetadata(metadata);
+    const rect = el.getBoundingClientRect();
+    updateOverlayPosition(ensureOverlay(), rect);
+    showContextMenu(event.clientX, event.clientY, el);
+  };
 
-    const activeTooltip = ensureTooltip();
-    const originalText = activeTooltip.textContent;
-    activeTooltip.textContent = 'Copied!';
-    activeTooltip.style.background = '#27ae60';
+  const handleMenuCopy = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = contextMenuTarget;
+    hideContextMenu();
+    copyMetadataForElement(target);
+  };
 
-    const finish = () => {
-      if (options?.onAfterCopy) {
-        options.onAfterCopy();
-      }
-    };
+  const handleMenuCopyHtml = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = contextMenuTarget;
+    hideContextMenu();
+    copyHtmlForElement(target);
+  };
 
-    if (options?.onCopy) {
-      options.onCopy(payload);
-      setTimeout(finish, 600);
-      return;
-    }
-
-    void copyToClipboard(targetWindow, payload).then(() => {
-      setTimeout(finish, 600);
-    });
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape') return;
+    hideContextMenu();
   };
 
   return {
@@ -312,16 +508,25 @@ export function createOverlayController(
       ensureOverlay();
       targetWindow.document.addEventListener('mousemove', handleMove);
       targetWindow.document.addEventListener('click', handleClick, true);
+      targetWindow.document.addEventListener('contextmenu', handleContextMenu, true);
+      targetWindow.document.addEventListener('keydown', handleEscape, true);
     },
     stop() {
       if (!active) return;
       active = false;
       targetWindow.document.removeEventListener('mousemove', handleMove);
       targetWindow.document.removeEventListener('click', handleClick, true);
+      targetWindow.document.removeEventListener('contextmenu', handleContextMenu, true);
+      targetWindow.document.removeEventListener('keydown', handleEscape, true);
       overlay?.remove();
       overlay = null;
       tooltip?.remove();
       tooltip = null;
+      tooltipPrimary = null;
+      tooltipSecondary = null;
+      contextMenu?.remove();
+      contextMenu = null;
+      contextMenuTarget = null;
     },
     isActive() {
       return active;

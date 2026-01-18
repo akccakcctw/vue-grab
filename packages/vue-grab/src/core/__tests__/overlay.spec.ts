@@ -113,7 +113,14 @@ describe('Overlay controller', () => {
     const tooltip = document.querySelector(
       '[data-vue-grab-tooltip="true"]'
     ) as HTMLDivElement
-    expect(tooltip.textContent).toBe('components/Tooltip.vue:51:3')
+    const primary = tooltip.querySelector(
+      '[data-vue-grab-tooltip-line="primary"]'
+    ) as HTMLDivElement
+    const secondary = tooltip.querySelector(
+      '[data-vue-grab-tooltip-line="secondary"]'
+    ) as HTMLDivElement
+    expect(primary.textContent).toBe('components/Tooltip.vue:51:3')
+    expect(secondary.textContent).toBe('Right click for options')
     controller.stop()
   })
 
@@ -157,7 +164,14 @@ describe('Overlay controller', () => {
     const tooltip = document.querySelector(
       '[data-vue-grab-tooltip="true"]'
     ) as HTMLDivElement
-    expect(tooltip.textContent).toBe('components/Tooltip.vue:9:4')
+    const primary = tooltip.querySelector(
+      '[data-vue-grab-tooltip-line="primary"]'
+    ) as HTMLDivElement
+    const secondary = tooltip.querySelector(
+      '[data-vue-grab-tooltip-line="secondary"]'
+    ) as HTMLDivElement
+    expect(primary.textContent).toBe('components/Tooltip.vue:9:4')
+    expect(secondary.textContent).toBe('Right click for options')
     controller.stop()
   })
 
@@ -191,7 +205,14 @@ describe('Overlay controller', () => {
     const tooltip = document.querySelector(
       '[data-vue-grab-tooltip="true"]'
     ) as HTMLDivElement
-    expect(tooltip.textContent).toBe('components/Tooltip.vue')
+    const primary = tooltip.querySelector(
+      '[data-vue-grab-tooltip-line="primary"]'
+    ) as HTMLDivElement
+    const secondary = tooltip.querySelector(
+      '[data-vue-grab-tooltip-line="secondary"]'
+    ) as HTMLDivElement
+    expect(primary.textContent).toBe('components/Tooltip.vue')
+    expect(secondary.textContent).toBe('Right click for options')
     controller.stop()
   })
 
@@ -252,6 +273,51 @@ describe('Overlay controller', () => {
     expect(writeText).toHaveBeenCalledTimes(1)
     const payload = writeText.mock.calls[0][0] as string
     expect(payload).toContain('{')
+    controller.stop()
+  })
+
+  it('copies metadata from context menu', () => {
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+
+    const onCopy = vi.fn()
+    const controller = createOverlayController(window, { onCopy })
+    controller.start()
+    target.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 8, clientY: 8 }))
+
+    const item = document.querySelector(
+      '[data-vue-grab-context-item="copy"]'
+    ) as HTMLButtonElement
+    expect(item).toBeTruthy()
+    item.click()
+
+    expect(onCopy).toHaveBeenCalledTimes(1)
+    controller.stop()
+  })
+
+  it('copies HTML from context menu', () => {
+    const target = document.createElement('button')
+    target.textContent = 'Copy Me'
+    document.body.appendChild(target)
+
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true
+    })
+
+    const controller = createOverlayController(window)
+    controller.start()
+    target.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 4, clientY: 6 }))
+
+    const item = document.querySelector(
+      '[data-vue-grab-context-item="copy-html"]'
+    ) as HTMLButtonElement
+    expect(item).toBeTruthy()
+    item.click()
+
+    expect(writeText).toHaveBeenCalledWith(target.outerHTML)
     controller.stop()
   })
 
