@@ -1,6 +1,6 @@
 {
   "name": "@akccakcctw/vue-grab",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "description": "Developer-only bridge for inspecting Vue/Nuxt component context from the DOM.",
   "repository": {
     "type": "git",
