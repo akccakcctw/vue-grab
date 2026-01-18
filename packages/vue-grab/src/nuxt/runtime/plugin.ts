@@ -1,5 +1,5 @@
 import { defineNuxtPlugin, useRuntimeConfig } from '#app';
-import { installVueGrab } from '../../core/api';
+import { installVueGrab } from '../../core/api.js';
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig().public?.vueGrab ?? {};

@@ -1,7 +1,7 @@
-import { extractMetadata, identifyComponent } from './identifier';
-import { createOverlayController } from './overlay';
-import type { OverlayOptions } from './overlay';
-import { createToggleWidget } from './widget';
+import { extractMetadata, identifyComponent } from './identifier.js';
+import { createOverlayController } from './overlay.js';
+import type { OverlayOptions } from './overlay.js';
+import { createToggleWidget } from './widget.js';
 
 export interface ComponentInfo {
   name: string;
@@ -39,15 +39,15 @@ function getComponentInfo(
 ): ComponentInfo | null {
   if (!el) return null;
   const instance = identifyComponent(el);
-  const fallback = !instance && resolver ? resolver(el) : null;
   const metadata = extractMetadata(instance, el);
+  if (!metadata) return null;
+  const fallback = !instance && resolver ? resolver(el) : null;
   if (fallback?.file) metadata.file = fallback.file;
   if (typeof fallback?.line === 'number') metadata.line = fallback.line;
   if (typeof fallback?.column === 'number') metadata.column = fallback.column;
-  if (!metadata) return null;
 
   return {
-    ...metadata,
+    ...(metadata as Omit<ComponentInfo, 'element'>),
     element: el
   };
 }
@@ -57,7 +57,7 @@ export function createVueGrabAPI(
   options: VueGrabOptions = {}
 ): VueGrabAPI {
   let active = false;
-  let domFileResolver = options.domFileResolver ?? null;
+  let domFileResolver = options.domFileResolver;
   const overlay = createOverlayController(targetWindow, {
     ...options,
     onAfterCopy: () => {
@@ -65,7 +65,7 @@ export function createVueGrabAPI(
     }
   });
   const widget = createToggleWidget(targetWindow, {
-    onToggle(nextActive) {
+    onToggle(nextActive: boolean) {
       if (nextActive) {
         api.activate();
       } else {
@@ -123,7 +123,7 @@ export function createVueGrabAPI(
       overlay.setStyle(style);
     },
     setDomFileResolver(resolver: VueGrabOptions['domFileResolver']) {
-      domFileResolver = resolver ?? null;
+      domFileResolver = resolver;
       overlay.setDomFileResolver(domFileResolver);
     }
   };

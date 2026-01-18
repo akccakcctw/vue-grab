@@ -59,7 +59,8 @@ function getLineCol(code: string, index: number) {
   const pre = code.slice(0, index)
   const lines = pre.split('\n')
   const line = lines.length
-  const column = lines[lines.length - 1].length + 1
+  const lastLine = lines[lines.length - 1] ?? ''
+  const column = lastLine.length + 1
   return { line, column }
 }
 
@@ -108,6 +109,7 @@ function injectComponentMetadata(code: string, file: string, source?: string) {
   )
   if (matchExportSfc && matchExportSfc.index !== undefined) {
     const name = matchExportSfc[1]
+    if (!name) return null
     const location = sourceLocation ?? getLineCol(code, matchExportSfc.index)
     const inject = createInjectedCode(name, file, location.line, location.column)
     return {
@@ -119,6 +121,7 @@ function injectComponentMetadata(code: string, file: string, source?: string) {
   const matchVar = code.match(/export default\s+([a-zA-Z0-9_$]+)/)
   if (matchVar && matchVar.index !== undefined) {
     const name = matchVar[1]
+    if (!name) return null
     const varMatch = code.match(
       new RegExp(`(?:const|let|var)\\s+${escapeRegExp(name)}\\s*=`)
     )

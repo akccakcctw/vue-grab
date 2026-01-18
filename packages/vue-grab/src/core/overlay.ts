@@ -1,4 +1,4 @@
-import { extractMetadata, identifyComponent } from './identifier';
+import { extractMetadata, identifyComponent } from './identifier.js';
 
 type OverlayController = {
   start: () => void;
@@ -213,7 +213,7 @@ export function createOverlayController(
   let tooltip: HTMLDivElement | null = null;
   let active = false;
   let overlayStyle: OverlayStyle = options?.overlayStyle ?? {};
-  let domFileResolver = options?.domFileResolver ?? null;
+  let domFileResolver = options?.domFileResolver;
 
   const ensureOverlay = () => {
     if (!overlay) {
@@ -251,6 +251,10 @@ export function createOverlayController(
     const instance = identifyComponent(el);
     const fallback = !instance && domFileResolver ? domFileResolver(el) : null;
     const metadata = extractMetadata(instance, el);
+    if (!metadata) {
+      activeTooltip.style.opacity = '0';
+      return;
+    }
     if (fallback?.file) metadata.file = fallback.file;
     if (typeof fallback?.line === 'number') metadata.line = fallback.line;
     if (typeof fallback?.column === 'number') metadata.column = fallback.column;
@@ -269,9 +273,11 @@ export function createOverlayController(
     event.preventDefault();
     event.stopPropagation();
     const el = event.target as HTMLElement | null;
+    if (!el) return;
     const instance = identifyComponent(el);
     const fallback = !instance && domFileResolver ? domFileResolver(el) : null;
     const metadata = extractMetadata(instance, el);
+    if (!metadata) return;
     if (fallback?.file) metadata.file = fallback.file;
     if (typeof fallback?.line === 'number') metadata.line = fallback.line;
     if (typeof fallback?.column === 'number') metadata.column = fallback.column;
@@ -342,7 +348,7 @@ export function createOverlayController(
       }
     },
     setDomFileResolver(resolver: OverlayOptions['domFileResolver']) {
-      domFileResolver = resolver ?? null;
+      domFileResolver = resolver;
     }
   };
 }

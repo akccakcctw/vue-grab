@@ -1,5 +1,5 @@
 import { addPlugin, createResolver, defineNuxtModule, addVitePlugin } from '@nuxt/kit';
-import { createVueGrabVitePlugin } from '../vite';
+import { createVueGrabVitePlugin } from '../vite.js';
 
 export type VueGrabNuxtModuleOptions = {
   enabled?: boolean;
@@ -16,7 +16,7 @@ export default defineNuxtModule<VueGrabNuxtModuleOptions>({
   defaults: {
     enabled: true
   },
-  setup(options, nuxt) {
+  setup(options: VueGrabNuxtModuleOptions, nuxt: any) {
     if (options.enabled === false) return;
     const shouldEnable = nuxt.options.dev || options.enabled === true;
     if (!shouldEnable) return;

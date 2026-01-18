@@ -1,5 +1,5 @@
-import { installVueGrab } from './core/api';
-import type { VueGrabOptions } from './core/api';
+import { installVueGrab } from './core/api.js';
+import type { VueGrabOptions } from './core/api.js';
 
 export type VueGrabPluginOptions = VueGrabOptions & {
   enabled?: boolean;
@@ -33,13 +33,23 @@ export function createVueGrabPlugin(options: VueGrabPluginOptions = {}) {
       const enabled =
         typeof options.enabled === 'boolean' ? options.enabled : isDevEnvironment();
       if (enabled && typeof window !== 'undefined') {
-        installVueGrab(window, {
-          overlayStyle: options.overlayStyle,
-          onCopy: options.onCopy,
-          copyOnClick: options.copyOnClick,
-          rootDir: options.rootDir,
-          domFileResolver: options.domFileResolver
-        });
+        const overlayOptions: VueGrabOptions = {};
+        if (options.overlayStyle !== undefined) {
+          overlayOptions.overlayStyle = options.overlayStyle;
+        }
+        if (options.onCopy !== undefined) {
+          overlayOptions.onCopy = options.onCopy;
+        }
+        if (options.copyOnClick !== undefined) {
+          overlayOptions.copyOnClick = options.copyOnClick;
+        }
+        if (options.rootDir !== undefined) {
+          overlayOptions.rootDir = options.rootDir;
+        }
+        if (options.domFileResolver !== undefined) {
+          overlayOptions.domFileResolver = options.domFileResolver;
+        }
+        installVueGrab(window, overlayOptions);
       }
     }
   };
