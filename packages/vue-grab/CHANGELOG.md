@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.2.2...vue-grab-v1.2.3) (2026-01-18)
+
+
+### Bug Fixes
+
+* add package keywords ([5b7ea25](https://github.com/akccakcctw/vue-grab/commit/5b7ea259707ec88017a1b0dd02b000c76592b6a1))
+
 ## [1.2.2](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.2.1...vue-grab-v1.2.2) (2026-01-18)
 
 
