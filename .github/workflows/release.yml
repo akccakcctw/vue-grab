@@ -36,6 +36,6 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @akccakcctw/vue-grab build
-      - run: pnpm --filter @akccakcctw/vue-grab publish --access public
+      - run: pnpm --filter @akccakcctw/vue-grab publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
