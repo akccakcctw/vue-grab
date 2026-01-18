@@ -73,3 +73,8 @@ Note: `onCopy` is only supported when using the Vue plugin directly.
 *   **Types:** `VueGrabOptions`, `OverlayOptions`, and `OverlayStyle` are exported from the package.
 *   **UI:** A floating toggle button is injected in dev to enable/disable grab mode.
 *   **Hover:** Tooltip shows `file:line:column` when available.
+
+## 6. Conventional Commits
+Use Conventional Commit messages: `<type>(scope): summary`.
+Common types: `feat`, `fix`, `docs`, `test`, `chore`, `refactor`.
+Example: `test: use explicit .js extensions in tests`.
