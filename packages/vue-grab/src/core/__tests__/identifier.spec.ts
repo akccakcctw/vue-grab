@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
-import { identifyComponent, extractMetadata } from '../identifier'
+import { identifyComponent, extractMetadata } from '../identifier.js'
 
 const TestComponent = defineComponent({
   name: 'TestComponent',

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { createOverlayController } from '../overlay'
+import { createOverlayController } from '../overlay.js'
 
 describe('Overlay controller', () => {
   afterEach(() => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createVueGrabVitePlugin } from '../vite'
+import { createVueGrabVitePlugin } from '../vite.js'
 
 function createVueConfig() {
   const vuePlugin = {

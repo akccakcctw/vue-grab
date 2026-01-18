@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import * as api from '../core/api'
-import { createVueGrabPlugin } from '../plugin'
+import * as api from '../core/api.js'
+import { createVueGrabPlugin } from '../plugin.js'
 
 describe('Vue plugin', () => {
   const originalWindow = globalThis.window

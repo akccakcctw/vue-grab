@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
-import { createVueGrabAPI, installVueGrab } from '../api'
+import { createVueGrabAPI, installVueGrab } from '../api.js'
 
 const TestComponent = defineComponent({
   name: 'TestComponent',

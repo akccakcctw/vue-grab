@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { createToggleWidget } from '../widget'
+import { createToggleWidget } from '../widget.js'
 
 describe('Toggle widget', () => {
   afterEach(() => {
