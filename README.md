@@ -134,8 +134,8 @@ Publishing is automated by release-please and GitHub Actions:
 3) Merge the release PR; the workflow creates a GitHub release and publishes to npm.
 
 Notes:
-- Requires `NPM_TOKEN` secret with publish access.
-- Publish step runs `pnpm publish --access public`.
+- Configure npm Trusted Publishing for `@akccakcctw/vue-grab` (GitHub Actions OIDC).
+- Publish step runs `npm publish --provenance --access public`.
 
 ## Acknowledgment
 
