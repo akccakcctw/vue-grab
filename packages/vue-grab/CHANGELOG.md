@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.2.3...vue-grab-v1.3.0) (2026-01-18)
+
+
+### Features
+
+* add context menu and tooltip hint ([8ab6e0d](https://github.com/akccakcctw/vue-grab/commit/8ab6e0de82cb3deb2a00e0435adc1a387a898be6))
+
 ## [1.2.3](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.2.2...vue-grab-v1.2.3) (2026-01-18)
 
 
