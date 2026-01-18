@@ -29,7 +29,11 @@
     "prepublishOnly": "pnpm build",
     "test": "vitest run"
   },
-  "keywords": [],
+  "keywords": [
+    "vue",
+    "nuxt",
+    "devtools"
+  ],
   "author": "",
   "license": "MIT",
   "publishConfig": {
