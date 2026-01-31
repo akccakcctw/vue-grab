@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import type { Plugin } from 'vite'
+import { writeAgentTask } from './node/agent-task.js'
 
 export type VueGrabVitePluginOptions = {
   enabled?: boolean
@@ -205,6 +206,27 @@ export function createVueGrabVitePlugin(options: VueGrabVitePluginOptions = {}):
           }
         }
       }
+    },
+    configureServer(server) {
+      if (!enabled) return
+
+      server.ws.on('vue-grab:agent-task', async (data: any, client: any) => {
+        const root = resolvedRoot || process.cwd()
+        let file = data.file
+        // If file is relative (starts with /), join with root
+        if (file && !path.isAbsolute(file) && file.startsWith('/')) {
+             file = path.join(root, file)
+        } else if (file && !path.isAbsolute(file)) {
+             file = path.join(root, file)
+        }
+        
+        await writeAgentTask(root, {
+            ...data,
+            file
+        })
+        
+        client.send('vue-grab:agent-task-result', { success: true })
+      })
     },
     transform(code, id) {
       if (!enabled) return

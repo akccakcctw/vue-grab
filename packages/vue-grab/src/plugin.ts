@@ -49,6 +49,15 @@ export function createVueGrabPlugin(options: VueGrabPluginOptions = {}) {
         if (options.domFileResolver !== undefined) {
           overlayOptions.domFileResolver = options.domFileResolver;
         }
+
+        if (options.onAgentTask !== undefined) {
+          overlayOptions.onAgentTask = options.onAgentTask;
+        } else if (typeof import.meta !== 'undefined' && (import.meta as any).hot) {
+           overlayOptions.onAgentTask = (task) => {
+             (import.meta as any).hot.send('vue-grab:agent-task', task);
+           };
+        }
+
         installVueGrab(window, overlayOptions);
       }
     }
