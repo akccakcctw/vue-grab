@@ -93,7 +93,7 @@ Note: `onCopy` is only supported when using the Vue plugin directly.
 *   **UI:** A floating toggle button is injected in dev to enable/disable grab mode.
 *   **Hover:** Tooltip shows `file:line:column` when available.
 
-## 6. Conventional Commits
+## 7. Conventional Commits
 Use Conventional Commit messages: `<type>(scope): summary`.
 Common types: `feat`, `fix`, `docs`, `test`, `chore`, `refactor`.
 Example: `test: use explicit .js extensions in tests`.

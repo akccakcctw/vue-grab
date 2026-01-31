@@ -81,8 +81,20 @@ A floating toggle button is injected in dev to switch grab mode on/off. Hover sh
 
 ## AI Agent Integration
 
-Press `Ctrl + X` (or `Cmd + X`) while hovering over a component to open the Agent Task dialog.
-Entering a prompt and clicking "Send Task" will generate a `.vue-grab/AI_TASK.md` file in your project root, containing the context and instructions for your AI agent.
+`vue-grab` enables a seamless workflow for instructing AI agents directly from your browser.
+
+1.  **Inspect**: Hover over any component in your application.
+2.  **Trigger**: Press `Ctrl + X` (or `Cmd + X` on Mac).
+3.  **Instruct**: A dialog will appear. Type your request (e.g., "Change the background color to blue" or "Refactor this component to use Composition API").
+4.  **Send**: Click "Send Task".
+
+`vue-grab` will verify the request and create a structured task file at `.vue-grab/AI_TASK.md` in your project root. This file contains:
+- Your instruction.
+- The component's file path, line, and column numbers.
+- A snapshot of the component's code (if available).
+
+You can then instruct your AI agent (Cursor, Claude, or a CLI tool) to:
+> "Execute the task in .vue-grab/AI_TASK.md"
 
 ## MCP Example
 
