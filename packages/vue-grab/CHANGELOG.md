@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.4.0](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.3.0...vue-grab-v1.4.0) (2026-01-31)
+
+
+### Features
+
+* **agent:** freeze highlight and add Ctrl+Enter shortcut ([2e6e8ad](https://github.com/akccakcctw/vue-grab/commit/2e6e8ada3794f412a3d0bbe17fa23d0549447631))
+* **agent:** implement browser-server bridge for task generation ([886de5b](https://github.com/akccakcctw/vue-grab/commit/886de5be125134627e05db826be9621601d3e3ce))
+* **agent:** implement frontend UI for agent task capture ([0028112](https://github.com/akccakcctw/vue-grab/commit/002811285258aecd47b06dff9ac0221a1bf3d7be))
+
+
+### Bug Fixes
+
+* **agent:** defensive payload construction ([439d201](https://github.com/akccakcctw/vue-grab/commit/439d201dc19e0792c28dc2775e329fd3ebbfce15))
+* **agent:** explicitly filter metadata payload ([98cd51c](https://github.com/akccakcctw/vue-grab/commit/98cd51c2820cbd3988279dd17fe063f8cf0fa2cd))
+* **agent:** sanitize metadata to avoid circular references ([3703bbc](https://github.com/akccakcctw/vue-grab/commit/3703bbcc63e56765fda5d0e7fe1508b2a5e1738f))
+
 ## [1.3.0](https://github.com/akccakcctw/vue-grab/compare/vue-grab-v1.2.3...vue-grab-v1.3.0) (2026-01-18)
 
 
