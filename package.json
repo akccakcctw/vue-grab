@@ -1,6 +1,7 @@
 {
   "name": "vue-grab-workspace",
   "private": true,
+  "packageManager": "pnpm@10.28.2",
   "scripts": {
     "test": "pnpm -r test",
     "dev:playground": "pnpm --filter vue-grab-playground dev",
