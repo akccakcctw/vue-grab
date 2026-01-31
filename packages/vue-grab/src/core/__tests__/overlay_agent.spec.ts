@@ -122,4 +122,73 @@ describe('Overlay agent integration', () => {
 
     controller.stop()
   })
+
+  it('handles circular references in props safely', () => {
+    const onAgentTask = vi.fn()
+    const controller = createOverlayController(window, { 
+      // @ts-expect-error - extending options for internal testing
+      onAgentTask 
+    })
+    controller.start()
+
+    const target = document.createElement('div')
+    target.className = 'target'
+    document.body.appendChild(target)
+    
+    // Create circular structure
+    const circularProp: any = { name: 'circular' }
+    circularProp.self = circularProp
+
+    // Create a complex nested circular structure simulating a VNode loop
+    const vnodeLike: any = { __v_isVNode: true, type: 'div', props: {} }
+    vnodeLike.props.vnode = vnodeLike 
+
+    // Mock Vue component metadata
+    ;(target as any).__vueParentComponent = {
+      type: {
+        name: 'CircularComponent',
+        __file: '/path/to/CircularComponent.vue'
+      },
+      props: {
+        circle: circularProp,
+        vnodeLoop: vnodeLike
+      }
+    }
+
+    Object.defineProperty(document, 'elementFromPoint', {
+      value: vi.fn(() => target),
+      configurable: true
+    })
+
+    // Hover to select
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10 }))
+
+    // Open dialog
+    document.dispatchEvent(new KeyboardEvent('keydown', { 
+      key: 'x', 
+      ctrlKey: true, 
+      bubbles: true 
+    }))
+
+    const dialog = document.querySelector('[data-vue-grab-agent-dialog="true"]') as HTMLElement
+    const textarea = dialog.querySelector('textarea') as HTMLTextAreaElement
+    const submitBtn = dialog.querySelectorAll('button')[1] as HTMLButtonElement
+    
+    // Set prompt
+    textarea.value = 'Fix circle'
+
+    // Submit
+    submitBtn.click()
+
+    expect(onAgentTask).toHaveBeenCalledTimes(1)
+    const payload = onAgentTask.mock.calls[0][0]
+    
+    // Check that we can stringify the payload without error
+    expect(() => JSON.stringify(payload)).not.toThrow()
+    
+    // Verify circular handling
+    expect(payload.props.circle.self).toBe('[Circular]')
+    
+    controller.stop()
+  })
 })
