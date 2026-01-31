@@ -191,4 +191,78 @@ describe('Overlay agent integration', () => {
     
     controller.stop()
   })
+
+  it('freezes highlight when dialog is open', () => {
+    const controller = createOverlayController(window)
+    controller.start()
+
+    const target1 = document.createElement('div')
+    target1.className = 'target1'
+    document.body.appendChild(target1)
+
+    const target2 = document.createElement('div')
+    target2.className = 'target2'
+    document.body.appendChild(target2)
+    
+    // Mock getBoundingClientRect
+    target1.getBoundingClientRect = () => ({ top: 10, left: 10, width: 10, height: 10 } as DOMRect)
+    target2.getBoundingClientRect = () => ({ top: 20, left: 20, width: 20, height: 20 } as DOMRect)
+
+    // Select target1
+    Object.defineProperty(document, 'elementFromPoint', { value: vi.fn(() => target1), configurable: true })
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10 }))
+
+    const overlay = document.querySelector('[data-vue-grab-overlay="true"]') as HTMLElement
+    expect(overlay.style.top).toBe('10px')
+
+    // Open dialog (Ctrl+X)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'x', ctrlKey: true, bubbles: true }))
+    
+    // Hover over target2 (simulate mouse move)
+    Object.defineProperty(document, 'elementFromPoint', { value: vi.fn(() => target2), configurable: true })
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 20, clientY: 20 }))
+
+    // Overlay should STILL be at target1
+    expect(overlay.style.top).toBe('10px')
+    
+    // Close dialog
+    const dialog = document.querySelector('[data-vue-grab-agent-dialog="true"]') as HTMLElement
+    dialog.querySelectorAll('button')[0].click() // Cancel
+
+    // Now hover over target2 should update overlay
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 20, clientY: 20 }))
+    expect(overlay.style.top).toBe('20px')
+
+    controller.stop()
+  })
+
+  it('submits on Ctrl+Enter', () => {
+    const onAgentTask = vi.fn()
+    const controller = createOverlayController(window, { 
+      // @ts-expect-error - extending options for internal testing
+      onAgentTask 
+    })
+    controller.start()
+
+    const target = document.createElement('div')
+    document.body.appendChild(target)
+    Object.defineProperty(document, 'elementFromPoint', { value: vi.fn(() => target), configurable: true })
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10 }))
+
+    // Open dialog
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'x', ctrlKey: true, bubbles: true }))
+    
+    const dialog = document.querySelector('[data-vue-grab-agent-dialog="true"]') as HTMLElement
+    const textarea = dialog.querySelector('textarea') as HTMLTextAreaElement
+    
+    textarea.value = 'Ctrl Enter Test'
+
+    // Trigger Ctrl+Enter on textarea
+    textarea.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }))
+
+    expect(onAgentTask).toHaveBeenCalledTimes(1)
+    expect(onAgentTask.mock.calls[0][0].prompt).toBe('Ctrl Enter Test')
+
+    controller.stop()
+  })
 })

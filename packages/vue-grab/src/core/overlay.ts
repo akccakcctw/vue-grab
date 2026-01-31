@@ -390,6 +390,7 @@ export function createOverlayController(
   let contextMenuTarget: HTMLElement | null = null;
   let agentDialog: HTMLDivElement | null = null;
   let currentHoveredElement: HTMLElement | null = null;
+  let freezeHighlight = false;
   let active = false;
   let overlayStyle: OverlayStyle = options?.overlayStyle ?? {};
   let domFileResolver = options?.domFileResolver;
@@ -459,17 +460,19 @@ export function createOverlayController(
     if (agentDialog) {
       agentDialog.remove();
       agentDialog = null;
+      freezeHighlight = false;
     }
   };
 
   const openAgentDialog = (target: HTMLElement) => {
     if (agentDialog) return;
+    freezeHighlight = true;
     const created = createAgentDialogElement(targetWindow);
     agentDialog = created.dialog;
     
     created.cancelBtn.onclick = closeAgentDialog;
     
-    created.submitBtn.onclick = () => {
+    const submit = () => {
         const prompt = created.textarea.value;
         if (!prompt.trim()) return;
 
@@ -505,6 +508,15 @@ export function createOverlayController(
         }
         closeAgentDialog();
     };
+
+    created.submitBtn.onclick = submit;
+
+    created.textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            submit();
+        }
+    });
 
     targetWindow.document.body.appendChild(agentDialog);
     created.textarea.focus();
@@ -558,6 +570,7 @@ export function createOverlayController(
   };
 
   const handleMove = (event: MouseEvent) => {
+    if (freezeHighlight) return;
     if (isIgnoredTarget(event.target)) return;
     const activeOverlay = ensureOverlay();
     const activeTooltip = ensureTooltip();
