@@ -475,11 +475,16 @@ export function createOverlayController(
 
         const metadata = resolveMetadata(target);
         if (metadata && options?.onAgentTask) {
-            const safeMetadata = safeClone(metadata, new WeakSet(), 5);
-            options.onAgentTask({
+            const safePayload = {
                 prompt,
-                ...(safeMetadata as object)
-            });
+                name: metadata.name,
+                file: metadata.file,
+                line: metadata.line,
+                column: metadata.column,
+                props: safeClone(metadata.props, new WeakSet(), 3),
+                data: safeClone(metadata.data, new WeakSet(), 3)
+            };
+            options.onAgentTask(safePayload);
         }
         closeAgentDialog();
     };
