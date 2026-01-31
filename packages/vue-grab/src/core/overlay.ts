@@ -475,15 +475,32 @@ export function createOverlayController(
 
         const metadata = resolveMetadata(target);
         if (metadata && options?.onAgentTask) {
-            const safePayload = {
-                prompt,
-                name: metadata.name,
-                file: metadata.file,
-                line: metadata.line,
-                column: metadata.column,
-                props: safeClone(metadata.props, new WeakSet(), 3),
-                data: safeClone(metadata.data, new WeakSet(), 3)
-            };
+            let safePayload;
+            try {
+                safePayload = {
+                    prompt,
+                    name: String(metadata.name),
+                    file: String(metadata.file),
+                    line: Number(metadata.line) || 0,
+                    column: Number(metadata.column) || 0,
+                    props: safeClone(metadata.props, new WeakSet(), 3),
+                    data: safeClone(metadata.data, new WeakSet(), 3)
+                };
+                // Verify serialization safety
+                JSON.stringify(safePayload);
+            } catch (e) {
+                console.error('vue-grab: Failed to sanitize agent task payload', e);
+                safePayload = {
+                    prompt,
+                    name: String(metadata.name || 'Unknown'),
+                    file: String(metadata.file || 'Unknown'),
+                    line: 0,
+                    column: 0,
+                    props: { error: 'Serialization failed' },
+                    data: { error: 'Serialization failed' }
+                };
+            }
+
             options.onAgentTask(safePayload);
         }
         closeAgentDialog();
