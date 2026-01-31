@@ -475,9 +475,10 @@ export function createOverlayController(
 
         const metadata = resolveMetadata(target);
         if (metadata && options?.onAgentTask) {
+            const safeMetadata = safeClone(metadata, new WeakSet(), 5);
             options.onAgentTask({
                 prompt,
-                ...metadata
+                ...(safeMetadata as object)
             });
         }
         closeAgentDialog();
