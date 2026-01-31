@@ -16,6 +16,7 @@ export type OverlayOptions = {
   overlayStyle?: OverlayStyle;
   onCopy?: (payload: string) => void;
   onAfterCopy?: () => void;
+  onAgentTask?: (task: any) => void;
   copyOnClick?: boolean;
   rootDir?: string;
   domFileResolver?: (el: HTMLElement) => {
@@ -298,6 +299,85 @@ async function copyToClipboard(targetWindow: Window, text: string) {
   textarea.remove();
 }
 
+function createAgentDialogElement(targetWindow: Window) {
+  const doc = targetWindow.document;
+  const dialog = doc.createElement('div');
+  dialog.setAttribute('data-vue-grab-agent-dialog', 'true');
+  dialog.setAttribute(IGNORE_EVENTS_ATTR, '');
+  Object.assign(dialog.style, {
+    position: 'fixed',
+    zIndex: '2147483648',
+    top: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: '400px',
+    padding: '16px',
+    borderRadius: '12px',
+    background: '#fff',
+    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.25)',
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  });
+
+  const title = doc.createElement('div');
+  title.textContent = 'Ask Agent';
+  Object.assign(title.style, {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#111'
+  });
+
+  const textarea = doc.createElement('textarea');
+  textarea.placeholder = 'What would you like to change? (e.g., "Make this button red")';
+  Object.assign(textarea.style, {
+    width: '100%',
+    height: '80px',
+    padding: '8px',
+    borderRadius: '6px',
+    border: '1px solid #ddd',
+    resize: 'vertical',
+    fontFamily: 'inherit',
+    fontSize: '13px'
+  });
+
+  const footer = doc.createElement('div');
+  Object.assign(footer.style, {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '8px'
+  });
+
+  const cancelBtn = doc.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  Object.assign(cancelBtn.style, {
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: 'none',
+    background: '#f5f5f5',
+    cursor: 'pointer',
+    fontSize: '13px'
+  });
+
+  const submitBtn = doc.createElement('button');
+  submitBtn.textContent = 'Send Task';
+  Object.assign(submitBtn.style, {
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: 'none',
+    background: '#111',
+    color: '#fff',
+    cursor: 'pointer',
+    fontSize: '13px'
+  });
+
+  footer.append(cancelBtn, submitBtn);
+  dialog.append(title, textarea, footer);
+
+  return { dialog, textarea, cancelBtn, submitBtn };
+}
+
 export function createOverlayController(
   targetWindow: Window,
   options?: OverlayOptions
@@ -308,6 +388,8 @@ export function createOverlayController(
   let tooltipSecondary: HTMLDivElement | null = null;
   let contextMenu: HTMLDivElement | null = null;
   let contextMenuTarget: HTMLElement | null = null;
+  let agentDialog: HTMLDivElement | null = null;
+  let currentHoveredElement: HTMLElement | null = null;
   let active = false;
   let overlayStyle: OverlayStyle = options?.overlayStyle ?? {};
   let domFileResolver = options?.domFileResolver;
@@ -373,6 +455,38 @@ export function createOverlayController(
     positionContextMenu(menu, x, y, targetWindow);
   };
 
+  const closeAgentDialog = () => {
+    if (agentDialog) {
+      agentDialog.remove();
+      agentDialog = null;
+    }
+  };
+
+  const openAgentDialog = (target: HTMLElement) => {
+    if (agentDialog) return;
+    const created = createAgentDialogElement(targetWindow);
+    agentDialog = created.dialog;
+    
+    created.cancelBtn.onclick = closeAgentDialog;
+    
+    created.submitBtn.onclick = () => {
+        const prompt = created.textarea.value;
+        if (!prompt.trim()) return;
+
+        const metadata = resolveMetadata(target);
+        if (metadata && options?.onAgentTask) {
+            options.onAgentTask({
+                prompt,
+                ...metadata
+            });
+        }
+        closeAgentDialog();
+    };
+
+    targetWindow.document.body.appendChild(agentDialog);
+    created.textarea.focus();
+  };
+
   const resolveMetadata = (el: HTMLElement | null) => {
     if (!el) return null;
     const instance = identifyComponent(el);
@@ -427,6 +541,9 @@ export function createOverlayController(
     const el = targetWindow.document.elementFromPoint(event.clientX, event.clientY) as
       | HTMLElement
       | null;
+      
+    currentHoveredElement = el;
+
     if (!el) {
       activeOverlay.style.width = '0';
       activeOverlay.style.height = '0';
@@ -461,6 +578,11 @@ export function createOverlayController(
         return;
       }
     }
+    // Prevent clicking "through" the agent dialog
+    if (agentDialog && agentDialog.contains(event.target as Node)) {
+        return;
+    }
+
     if (options?.copyOnClick === false) return;
     if (isIgnoredTarget(event.target)) return;
     event.preventDefault();
@@ -496,9 +618,18 @@ export function createOverlayController(
     copyHtmlForElement(target);
   };
 
-  const handleEscape = (event: KeyboardEvent) => {
-    if (event.key !== 'Escape') return;
-    hideContextMenu();
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      hideContextMenu();
+      closeAgentDialog();
+      return;
+    }
+    if (event.key === 'x' && (event.ctrlKey || event.metaKey)) {
+        if (currentHoveredElement) {
+            event.preventDefault();
+            openAgentDialog(currentHoveredElement);
+        }
+    }
   };
 
   return {
@@ -509,7 +640,7 @@ export function createOverlayController(
       targetWindow.document.addEventListener('mousemove', handleMove);
       targetWindow.document.addEventListener('click', handleClick, true);
       targetWindow.document.addEventListener('contextmenu', handleContextMenu, true);
-      targetWindow.document.addEventListener('keydown', handleEscape, true);
+      targetWindow.document.addEventListener('keydown', handleKeyDown, true);
     },
     stop() {
       if (!active) return;
@@ -517,7 +648,7 @@ export function createOverlayController(
       targetWindow.document.removeEventListener('mousemove', handleMove);
       targetWindow.document.removeEventListener('click', handleClick, true);
       targetWindow.document.removeEventListener('contextmenu', handleContextMenu, true);
-      targetWindow.document.removeEventListener('keydown', handleEscape, true);
+      targetWindow.document.removeEventListener('keydown', handleKeyDown, true);
       overlay?.remove();
       overlay = null;
       tooltip?.remove();
@@ -527,6 +658,8 @@ export function createOverlayController(
       contextMenu?.remove();
       contextMenu = null;
       contextMenuTarget = null;
+      closeAgentDialog();
+      currentHoveredElement = null;
     },
     isActive() {
       return active;
