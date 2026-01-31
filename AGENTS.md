@@ -60,13 +60,32 @@ When `vue-grab` is active in a development environment, it exposes `window.__VUE
     ```
 2.  **Step 2:** Analyze `props` and `data` to understand why the UI is rendering a certain way.
 
-## 4. Nuxt Support
+## 4. AI Agent Task Generation
+
+`vue-grab` now supports a direct workflow for generating AI tasks from the browser.
+
+### Workflow
+1.  **Select:** In the browser, verify `vue-grab` is active (hover over elements).
+2.  **Trigger:** Press `Ctrl + X` (or `Cmd + X` on Mac) while hovering over a component.
+3.  **Prompt:** A dialog appears. Enter your instruction (e.g., "Change this button to red").
+4.  **Generate:** Click "Send Task".
+5.  **Result:** A file is created at `.vue-grab/AI_TASK.md` in the project root.
+
+### Task File Structure (`.vue-grab/AI_TASK.md`)
+This file contains:
+*   **Instruction:** The user's prompt.
+*   **Context:** File path and location (line/column).
+*   **Snippet:** A code snippet of the component (if available).
+
+Agents can watch this file or be instructed to "Execute the task in .vue-grab/AI_TASK.md".
+
+## 5. Nuxt Support
 In Nuxt applications, `vue-grab` is automatically injected via a Nuxt Module. The API remains identical.
 Configuration: `vueGrab` accepts `enabled`, optional `overlayStyle` (CSS style map), and `copyOnClick`.
 
 Note: `onCopy` is only supported when using the Vue plugin directly.
 
-## 5. Development Tips for Agents
+## 6. Development Tips for Agents
 *   **Absolute Paths:** `vue-grab` provides absolute file paths in development mode, allowing you to immediately open the correct file without guessing.
 *   **Anonymous Components:** If a component doesn't have a name, `vue-grab` defaults to `AnonymousComponent`. Try to look at the `file` property to identify it.
 *   **Package Manager:** Use `pnpm` instead of `npm` for all package scripts and installs.

@@ -79,6 +79,11 @@ When active, `window.__VUE_GRAB__` exposes:
 
 A floating toggle button is injected in dev to switch grab mode on/off. Hover shows file:line:column.
 
+## AI Agent Integration
+
+Press `Ctrl + X` (or `Cmd + X`) while hovering over a component to open the Agent Task dialog.
+Entering a prompt and clicking "Send Task" will generate a `.vue-grab/AI_TASK.md` file in your project root, containing the context and instructions for your AI agent.
+
 ## MCP Example
 
 ```js
