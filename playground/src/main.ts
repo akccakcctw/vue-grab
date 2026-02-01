@@ -5,12 +5,12 @@ import './style.css'
 
 const app = createApp(App)
 
-if (import.meta.env.DEV) {
-  app.use(
-    createVueGrabPlugin({
-      copyOnClick: true,
-    })
-  )
-}
+const grabEnabled = import.meta.env.DEV || import.meta.env.VITE_VUE_GRAB === 'true'
+app.use(
+  createVueGrabPlugin({
+    copyOnClick: true,
+    enabled: grabEnabled,
+  })
+)
 
 app.mount('#app')

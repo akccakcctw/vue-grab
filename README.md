@@ -35,6 +35,35 @@ if (import.meta.env.DEV) {
 app.mount('#app')
 ```
 
+## Demo / Production Builds
+
+`vue-grab` is dev-only by default. For public demos (e.g. GitHub Pages), gate it with a build-time flag
+and enable both the runtime plugin and the Vite metadata injector.
+
+```ts
+// vite.config.ts
+import { defineConfig, loadEnv } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { createVueGrabVitePlugin } from '@akccakcctw/vue-grab/vite'
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const grabEnabled = mode === 'development' || env.VITE_VUE_GRAB === 'true'
+
+  return {
+    plugins: [vue(), createVueGrabVitePlugin({ enabled: grabEnabled })]
+  }
+})
+```
+
+```ts
+// main.ts
+const grabEnabled = import.meta.env.DEV || import.meta.env.VITE_VUE_GRAB === 'true'
+app.use(createVueGrabPlugin({ copyOnClick: true, enabled: grabEnabled }))
+```
+
+Note: enabling this in production exposes component file paths and source locations. Only use it for trusted demos.
+
 ## Nuxt Usage
 
 ```ts
