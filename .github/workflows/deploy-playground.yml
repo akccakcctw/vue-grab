@@ -30,6 +30,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @akccakcctw/vue-grab build
       - run: pnpm build:playground
         env:
           BASE_URL: /${{ github.event.repository.name }}/
